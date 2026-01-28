@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SocioVoice SHINBASHI | sv_shinbashi_v1_09</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+    :root{
+      --brand:#00897B;
+      --bg:#eee;
+      --text:#333;
+      --frameMax:414px;
+    }
+    body{
+      font-family:'Inter','Noto Sans JP',system-ui,-apple-system,'Segoe UI',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+    /* Phone frame */
+    #app-frame{
+      max-width:var(--frameMax);
+      margin:0 auto;
+      height:100vh;
+      background:#fff;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 30px rgba(0,0,0,.1);
+    }
+    /* Screens */
+    .screen{
+      position:absolute; inset:0;
+      background:#fff;
+      display:none;
+      opacity:0;
+      transition:opacity .25s ease;
+      overflow:hidden;
+    }
+    .screen.active{ display:block; opacity:1; z-index:10; }
+    /* Scroll area within screens (keeps bottom tab fixed) */
+    .screen-scroll{
+      height:100%;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:92px; /* bottom tab + safe area */
+    }
+    /* Bottom tab */
+    .tabbar{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      width:100%;
+      background:#fff;
+      border-top:1px solid #f3f4f6;
+      display:flex;
+      justify-content:space-around;
+      padding:10px 0 18px;
+      z-index:60;
+    }
+    .tabbtn{ color:#9ca3af; font-size:10px; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:4px; width:25%; }
+    .tabbtn .ms{ font-family:'Material Symbols Rounded'; font-size:24px; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24; }
+    .ms.filled{ font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 24; }
+    .tabbtn.active{ color:var(--brand); }
+    /* Header */
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid #f3f4f6;
+    }
+
+    /* Brand wordmark (Splash + Headers unified) */
+.sv-wordmark{
+  font-family:'Zen Maru Gothic','Inter','Noto Sans JP',system-ui,-apple-system,Segoe UI,Roboto,'Hiragino Sans','Noto Sans JP',sans-serif;
+  font-weight:700;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+  line-height:1.0;
+  white-space:nowrap;
+  opacity:.98;
+}
+.sv-wordmark--header{ font-size:20px; }
+.sv-wordmark--splash{ font-size:32px; }
+.sv-gap{ display:inline-block; width:.18em; }
+
+.header-avatar{ border-radius:9999px !important; }
+
+/* Favorites screen (Material 3 Expressive-ish, minimal & clean) */
+    .segmented{
+      display:flex;
+      gap:4px;
+      padding:4px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(15,23,42,.04);
+    }
+    .segbtn{
+      flex:1;
+      height:36px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      color:#64748b;
+      background:transparent;
+    }
+    .segbtn.active{
+      background:#fff;
+      color:var(--brand);
+      border:1px solid rgba(0,137,123,.18);
+    }
+    .m3-card{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:18px;
+      background:#fff;
+    }
+    /* Material Symbols helper */
+    .ms{
+      font-family:'Material Symbols Rounded';
+      font-weight:500;
+      font-style:normal;
+      line-height:1;
+      display:inline-block;
+      vertical-align:middle;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;
+    }
+    .ms.fill{ font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 24; }
+    /* Components */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(17,24,39,.10);
+      background:rgba(255,255,255,.70);
+      color:#111827;
+      font-size:12px;
+      font-weight:700;
+      line-height:1;
+      box-shadow:0 1px 0 rgba(17,24,39,.04);
+    }
+    .badge--soft-teal{
+      border-color:rgba(0,137,123,.18);
+      background:rgba(0,137,123,.08);
+      color:#0f766e;
+    }
+    .badge--soft-amber{
+      border-color:rgba(245,158,11,.25);
+      background:rgba(245,158,11,.10);
+      color:#92400e;
+    }
+    .badge--soft-slate{
+      border-color:rgba(15,23,42,.14);
+      background:rgba(15,23,42,.06);
+      color:#0f172a;
+    }
+    .badge-shop{
+      background:#111827;
+      color:#fff;
+      border-color:#111827;
+    }
+    .post-official{ background:#F7FFFD; border-left:4px solid var(--brand); }
+    .post-progress{ background:#F8FAFC; border-left:4px solid #111827; }
+    .post-trend{ background:#FFFBEB; border-left:4px solid #F59E0B; }
+
+    .img-placeholder{
+      background:#e5e7eb;
+      border-radius:4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#9ca3af;
+      font-size:12px;
+      font-weight:900;
+      position:relative;
+      overflow:hidden;
+    }
+    .img-placeholder:after{
+      content:"image";
+      font-family:'Material Symbols Rounded';
+      font-size:26px;
+      opacity:.55;
+      margin-left:8px;
+    }
+    /* Ticket */
+    .ticket-dashed{
+      border:2px dashed var(--brand);
+      background:#F0FDFA;
+      position:relative;
+    }
+    .ticket-notch{
+      position:absolute;
+      width:16px; height:16px;
+      background:#fff;
+      border-radius:50%;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:1;
+    }
+    /* Guest blur */
+    .blur-overlay{
+      position:absolute;
+      left:0; right:0; bottom:92px; /* above tab bar */
+      height:220px;
+      background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1) 42%);
+      display:flex;
+      align-items:flex-end;
+      padding:18px;
+      z-index:40;
+    }
+    /* Floating Action Button */
+    .fab{
+      position:absolute;
+      right:16px;
+      bottom:108px;
+      width:56px;
+      height:56px;
+      border-radius:999px;
+      background:var(--brand);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 18px 30px rgba(0,0,0,.18);
+      z-index:70;
+    }
+    .fab .ms{ font-size:28px; }
+    /* Modal */
+    .modal{ display:none; }
+    .modal.active{ display:flex; }
+    /* Small helper */
+    .tap{ cursor:pointer; }
+
+    
+    
+    
+    /* --- M3 Expressive-ish chips (v13.3.8) --- */
+    .chip{
+      box-sizing:border-box;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+
+      height:28px;                  /* unified height */
+      padding:0 12px;               /* unified padding */
+      border-radius:999px;
+
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.80);
+      color:#0f172a;
+
+      font-size:12px;               /* unified type */
+      font-weight:700;
+      line-height:1;
+      letter-spacing:.01em;
+      white-space:nowrap;
+
+      backdrop-filter:saturate(140%) blur(10px);
+      -webkit-backdrop-filter:saturate(140%) blur(10px);
+      box-shadow:0 1px 0 rgba(15,23,42,.05);
+    }
+    .chip .ms{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;               /* optically balanced in 28px */
+      line-height:1;
+    }
+    .chip--teal{ border-color:rgba(0,137,123,.22); background:rgba(0,137,123,.10); color:#0f766e; }
+    .chip--amber{ border-color:rgba(245,158,11,.26); background:rgba(245,158,11,.12); color:#92400e; }
+    .chip--purple{ border-color:rgba(139,92,246,.26); background:rgba(139,92,246,.12); color:#5b21b6; }
+    .chip--slate{ border-color:rgba(15,23,42,.16); background:rgba(15,23,42,.06); color:#0f172a; }
+    .chip--rose{ border-color:rgba(244,63,94,.26); background:rgba(244,63,94,.10); color:#9f1239; }
+    .chip--outline{ background:transparent; }
+
+    .name-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .meta-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:6px; }
+
+/* --- UI refinement (v13.2): consistent rhythm --- */
+    :root{
+      --gutter:16px;
+      --radius:10px;
+      --hairline:#eef0f3;
+      --textSub:#6b7280;
+    }
+    #app-frame{
+      border-radius:0;
+    }
+    .header{
+      border-bottom:1px solid var(--hairline);
+    }
+    .tabbar{
+      border-top:1px solid var(--hairline);
+      padding-bottom:calc(14px + env(safe-area-inset-bottom));
+    }
+    .screen-scroll{
+      padding-bottom:calc(92px + env(safe-area-inset-bottom));
+    }
+    /* unify card look without changing markup */
+    article{
+      -webkit-tap-highlight-color: transparent;
+    }
+    .badge{
+      border-radius:6px;
+    }
+    .img-placeholder{
+      border-radius:8px;
+    }
+
+  
+    .icon-only{
+      background:transparent;
+      border:0;
+      padding:6px;
+      border-radius:9999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      color:#6b7280;
+    }
+    .icon-only:hover{ background:#f3f4f6; }
+    .icon-only:active{ background:#e5e7eb; }
+
+    /* Timeline action icons (slightly smaller) */
+    .actions-row .ms{ font-size:20px; }
+
+
+
+    /* SocioVoice Splash v11 mesh (integrated) */
+    .screen.sv-splash{ background:#fff; display:none; align-items:center; justify-content:center; }
+    .screen.active.sv-splash{ display:flex; }
+
+    .sv-splash-mesh{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(125% 92% at 50% 5%,
+          rgba(255,255,255,0.998) 0%,
+          rgba(255,255,255,0.92) 38%,
+          rgba(233,250,247,0.50) 64%,
+          rgba(233,250,247,0.00) 80%),
+        radial-gradient(135% 78% at 50% 50%,
+          rgba(255,255,255,0.92) 0%,
+          rgba(255,255,255,0.78) 30%,
+          rgba(233,250,247,0.26) 56%,
+          rgba(255,255,255,0.00) 76%),
+        radial-gradient(92% 58% at 18% 38%,
+          rgba(0,137,123,0.16) 0%,
+          rgba(0,137,123,0.10) 46%,
+          rgba(255,255,255,0.00) 76%),
+        radial-gradient(96% 62% at 86% 34%,
+          rgba(0,137,123,0.14) 0%,
+          rgba(0,137,123,0.08) 48%,
+          rgba(255,255,255,0.00) 78%),
+        radial-gradient(112% 72% at 30% 74%,
+          rgba(0,121,107,0.18) 0%,
+          rgba(0,121,107,0.12) 50%,
+          rgba(255,255,255,0.00) 82%),
+        radial-gradient(116% 80% at 78% 78%,
+          rgba(0,121,107,0.20) 0%,
+          rgba(0,121,107,0.12) 54%,
+          rgba(255,255,255,0.00) 84%),
+        linear-gradient(to bottom,
+          #F6FFFE 0%,
+          rgba(233,250,247,0.84) 20%,
+          rgba(0,137,123,0.08) 46%,
+          rgba(0,137,123,0.20) 68%,
+          rgba(0,121,107,0.40) 94%,
+          rgba(0,121,107,0.42) 100%);
+    }
+    .sv-splash-mesh::after{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background: radial-gradient(58% 40% at 54% 58%,
+          rgba(255,255,255,0.08) 0%,
+          rgba(255,255,255,0.03) 64%,
+          rgba(255,255,255,0.0) 86%);
+      filter: blur(18px);
+      opacity:.18;
+      pointer-events:none;
+    }
+    .sv-splash-content{
+      position:relative;
+      height:100%;
+      width:100%;
+      display:grid;
+      place-items:center;
+      padding:
+        calc(env(safe-area-inset-top) + 24px)
+        calc(env(safe-area-inset-right) + 24px)
+        calc(env(safe-area-inset-bottom) + 24px)
+        calc(env(safe-area-inset-left) + 24px);
+      box-sizing:border-box;
+      text-align:center;
+    }
+    .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  
+
+    /* M3 progressive top tabs (clean + bold) */
+    .m3tabs{display:flex; border-bottom:1px solid #f3f4f6; background:#fff;}
+    .m3tab{flex:1; padding:12px 0; font-weight:900; font-size:14px; color:#9ca3af; position:relative; transition:color .18s ease;}
+    .m3tab.active{color:var(--brand);} 
+    .m3tab.active::after{content:''; position:absolute; left:18%; right:18%; bottom:-1px; height:3px; background:var(--brand); border-radius:999px;}
+
+  
+    /* Header notification badge */
+    .notif-btn{ position:relative; }
+    .notif-badge{
+      position:absolute;
+      top:2px; right:2px;
+      min-width:16px;
+      height:16px;
+      padding:0 5px;
+      border-radius:999px;
+      background:#ef4444;
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      border:2px solid #fff;
+    }
+    
+
+    /* HOT SHINBASHI module */
+    .hot-card{min-width:170px;max-width:190px}
+    .hot-card:focus{outline:2px solid var(--brand);outline-offset:2px}
+</style>
+  <meta name="sv_version" content="sv_shinbashi_v1_09">
+</head>
+<body>
+<div id="app-frame">
+
+  <!-- SPLASH -->
+  <section id="screen-splash" class="screen active sv-splash">
+    <div class="sv-splash-mesh"></div>
+    <div class="sv-splash-content">
+      <div class="sv-wordmark sv-wordmark--splash text-[var(--brand)]" aria-label="SOCIO VOICE">SOCIO<span class="sv-gap"></span>VOICE</div>
+    </div>
+  </section>
+<!-- GUEST (Preview timeline w/ blur CTA) -->
+  <section id="screen-guest" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-4 py-3 flex justify-between items-center">
+        <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-black bg-gray-100 text-gray-500 px-2 py-1 rounded">GUEST</span>
+          <button class="tap notif-btn" onclick="openNotifications()" aria-label="通知">
+            <span class="ms text-[26px] text-gray-500">notifications</span>
+            <span class="notif-badge hidden">0</span>
+          </button>
+          <button class="tap" onclick="openAccount()" aria-label="アカウント">
+            <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+              <span class="ms text-[22px]">person</span>
+            </div>
+          </button>
+        </div>
+      </header>
+
+      <div class="px-0">
+        <!-- same content as home but truncated (still clickable opens detail + guard) -->
+        <article class="post-official p-4 border-b border-gray-100 tap" data-open="post-1">
+          <div class="flex gap-3 mb-2">
+            <div class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-[var(--brand)] rounded-full">
+              <span class="ms">auto_awesome</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-sm text-gray-900">SocioVoice 新橋</span>
+                <span class="text-[10px] border border-[var(--brand)] text-[var(--brand)] px-1 font-black">OPS</span>
+              </div>
+              <p class="text-xs text-gray-500">10分前</p>
+            </div>
+          </div>
+          <div class="pl-[3.25rem]">
+            <h3 class="font-bold text-sm mb-1">【今夜】新橋の空気メモ（混雑/キャッチ）</h3>
+            <p class="text-sm text-gray-800 leading-relaxed">混雑しやすい通り・声かけが多いエリアの目安を更新しました。無理せず、危ないと思ったら離脱でOK。</p>
+            <div class="mt-3 inline-flex items-center gap-2 text-xs text-gray-400">
+              <span class="ms" style="font-size:18px">visibility</span> 詳細を見る
+            </div>
+          </div>
+        </article>
+
+        <article class="p-4 border-b border-gray-100 bg-white tap" data-open="post-2">
+          <div class="flex justify-between mb-2">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 bg-gray-100 flex items-center justify-center text-gray-600 rounded-full">
+                <span class="ms">local_bar</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-gray-900">365ベーカリー</span>
+                  <span class="badge badge-shop">SHOP</span>
+                </div>
+                <p class="text-xs text-gray-500">駅前通り</p>
+              </div>
+            </div>
+            <span class="border border-gray-900 text-gray-900 text-[10px] font-black px-2 py-0.5 h-6">🔥 NOW</span>
+          </div>
+          <div class="pl-[3.25rem]">
+            <p class="text-sm text-gray-900 mb-3">ただいまクロワッサンが焼き上がりました！🥐</p>
+            <div class="img-placeholder w-full aspect-video mb-3 rounded-sm">[Image: Fresh Croissants]</div>
+            <div class="flex gap-5 text-gray-400 text-sm">
+              <button class="inline-flex items-center gap-1" data-action="requires-verify"><span class="ms">favorite</span> 14</button>
+              <button class="inline-flex items-center gap-1" data-action="requires-verify"><span class="ms">chat_bubble</span> 2</button>
+              <button class="inline-flex items-center gap-1" data-action="requires-verify"><span class="ms">share</span></button>
+            </div>
+          </div>
+        </article>
+
+        <div class="p-4 border-b border-gray-100 opacity-50 blur-[2px]">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+            <div class="h-4 w-40 bg-gray-200 rounded"></div>
+          </div>
+          <div class="mt-2 h-16 w-full bg-gray-200 rounded"></div>
+        </div>
+        <div class="p-4 border-b border-gray-100 opacity-30 blur-[4px]">
+          <div class="mt-2 h-16 w-full bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blur-overlay">
+      <div class="w-full text-center">
+        <p class="font-black text-gray-800 mb-1">会員登録で“全部見える”</p>
+        <p class="text-xs text-gray-500 mb-4">投稿やアクションは、SMSログイン後に解放。</p>
+        <button class="w-full bg-[var(--brand)] text-white font-black py-3 rounded-sm shadow" onclick="nav('signup-1')">新規登録してはじめる</button>
+        <button class="mt-3 text-xs text-gray-400" onclick="quickLogin()">ログイン（Mock）</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNUP 1 -->
+  <section id="screen-signup-1" class="screen">
+    <div class="screen-scroll px-6 pt-10">
+      <div class="w-full bg-gray-100 h-1 mb-8"><div class="bg-[var(--brand)] h-1 w-1/3"></div></div>
+      <h2 class="text-2xl font-black mb-2">ようこそ。</h2>
+      <p class="text-gray-500 mb-8">まずは、街で使う名前を教えてください。</p>
+
+      <label class="text-xs font-black text-gray-400 block mb-1">ニックネーム</label>
+      <input id="input-nick" class="w-full px-3 py-3 border border-gray-200 rounded-sm text-base mb-4 focus:outline-none focus:border-[var(--brand)]" placeholder="例: ヒロシ" oninput="checkStep1()" />
+
+      <div class="mt-6 flex justify-center">
+        <div id="icon-preview" class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-gray-300">
+          <span class="ms" style="font-size:40px">person</span>
+        </div>
+      </div>
+      <p class="text-center text-xs text-gray-400 mt-2">あなたのアイコンが自動生成されます（Mock）</p>
+
+      <button id="btn-step1" class="mt-8 w-full bg-[var(--brand)] text-white font-black py-3 rounded-sm opacity-50 cursor-not-allowed" disabled onclick="nav('signup-2')">次へ</button>
+      <button class="mt-4 w-full text-xs text-gray-400" onclick="nav('guest')">戻る</button>
+    </div>
+  </section>
+
+  <!-- SIGNUP 2 -->
+  <section id="screen-signup-2" class="screen">
+    <div class="screen-scroll px-6 pt-10">
+      <div class="w-full bg-gray-100 h-1 mb-8"><div class="bg-[var(--brand)] h-1 w-2/3"></div></div>
+      <h2 class="text-2xl font-black mb-2">あなたはどんな人？</h2>
+      <p class="text-gray-500 mb-8">行動圏と年齢から、属性バッジを作ります（Mock）。</p>
+
+      <label class="text-xs font-black text-gray-400 block mb-1">行動圏（新橋周辺・任意）</label>
+      <input id="input-area" type="tel" class="w-full px-3 py-3 border border-gray-200 rounded-sm text-base mb-4 focus:outline-none focus:border-[var(--brand)]" placeholder="例: 新橋 / 汐留 / 内幸町 / 虎ノ門" oninput="simulateBadgeGen()" />
+
+      <label class="text-xs font-black text-gray-400 block mb-1">生年月日</label>
+      <input id="input-birth" type="date" class="w-full px-3 py-3 border border-gray-200 rounded-sm text-base mb-4 focus:outline-none focus:border-[var(--brand)]" onchange="simulateBadgeGen()" />
+
+      <div id="badge-container" class="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 min-h-[100px] flex flex-wrap gap-2 content-center justify-center">
+        <span class="text-xs text-gray-400">ここにバッジが生成されます…</span>
+      </div>
+
+      <button id="btn-step2" class="mt-8 w-full bg-[var(--brand)] text-white font-black py-3 rounded-sm opacity-50 cursor-not-allowed" disabled onclick="nav('signup-3')">次へ</button>
+      <button class="mt-4 w-full text-xs text-gray-400" onclick="nav('signup-1')">戻る</button>
+    </div>
+  </section>
+
+  <!-- SIGNUP 3 -->
+  <section id="screen-signup-3" class="screen">
+    <div class="screen-scroll px-6 pt-10">
+      <div class="w-full bg-gray-100 h-1 mb-8"><div class="bg-[var(--brand)] h-1 w-full"></div></div>
+      <h2 class="text-2xl font-black mb-2">準備完了です。</h2>
+      <p class="text-gray-500 mb-8">最後に利用規約を確認してください。</p>
+
+      <div class="h-36 bg-gray-50 border border-gray-200 rounded-sm p-3 text-xs text-gray-500 overflow-y-auto mb-4">
+        <p class="font-black text-gray-700 mb-2">利用規約（要約）</p>
+        <ol class="list-decimal pl-4 space-y-1">
+          <li>相互信頼の原則（迷惑行為・虚偽情報は停止対象）</li>
+          <li>投稿・アクションはSMSログイン後に解放</li>
+          <li>店舗（法人）は法人番号で登録し、招待制で運用</li>
+        </ol>
+      </div>
+
+      <label class="flex items-center gap-3 mb-8 p-3 border border-gray-200 rounded-sm cursor-pointer hover:bg-gray-50">
+        <input type="checkbox" id="check-terms" class="w-5 h-5 accent-[var(--brand)]" onchange="checkStep3()" />
+        <span class="text-sm font-black">規約に同意して始める</span>
+      </label>
+
+      <button id="btn-step3" class="w-full bg-[var(--brand)] text-white font-black py-3 rounded-sm opacity-50 cursor-not-allowed" disabled onclick="finishSignup()">SocioVoiceを始める</button>
+      <button class="mt-4 w-full text-xs text-gray-400" onclick="nav('signup-2')">戻る</button>
+    </div>
+  </section>
+
+  <!-- HOME (Timeline) -->
+  <section id="screen-home" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-4 py-3 flex justify-between items-center">
+        <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+        <div class="flex items-center gap-2">
+        <button class="tap notif-btn" onclick="openNotifications()" aria-label="通知">
+          <span class="ms text-[26px] text-gray-500">notifications</span>
+          <span class="notif-badge hidden">0</span>
+        </button>
+        <button class="tap" onclick="openAccount()" aria-label="アカウント">
+          <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+            <span class="ms text-[22px]">person</span>
+          </div>
+        </button>
+      </div>
+      </header>
+      <div id="home-banner" class="px-4 pt-4"></div>
+
+      <div id="timeline" class="px-0 pb-4">
+        <!-- posts injected -->
+      </div>
+    </div>
+
+    <!-- FAB: post create -->
+    <button class="fab tap" onclick="openComposer()" aria-label="投稿作成">
+      <span class="ms fill">edit</span>
+    </button>
+
+  </section>
+
+  <!-- FOLLOW TAB -->
+  <section id="screen-follow" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-4 py-3 flex justify-between items-center">
+        <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+        <div class="flex items-center gap-2">
+        <button class="tap notif-btn" onclick="openNotifications()" aria-label="通知">
+          <span class="ms text-[26px] text-gray-500">notifications</span>
+          <span class="notif-badge hidden">0</span>
+        </button>
+        <button class="tap" onclick="openAccount()" aria-label="アカウント">
+          <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+            <span class="ms text-[22px]">person</span>
+          </div>
+        </button>
+      </div>
+      </header>
+
+      <div class="m3tabs sticky top-[49px] z-40">
+        <button id="fav-tab-liked" class="m3tab active" onclick="setFavMode('liked')">いいね</button>
+        <button id="fav-tab-want" class="m3tab" onclick="setFavMode('want')">行きたい</button>
+        <button id="fav-tab-follow" class="m3tab" onclick="setFavMode('follow')">フォロー</button>
+        <button id="fav-tab-feed" class="m3tab" onclick="setFavMode('feed')">フォローTL</button>
+      </div>
+
+      <div class="px-4 pt-4">
+<!-- Follow feed panel -->
+        <div id="fav-panel-feed" class="hidden">
+          <div class="text-xs text-gray-500 leading-relaxed">
+            フォローしている人・お店だけのタイムラインです（公式は常に表示）。
+          </div>
+
+          <div id="fav-feed-timeline" class="mt-3 -mx-4 border-y border-gray-100 bg-white"></div>
+
+          <div id="fav-feed-empty" class="mt-10 text-center text-sm text-gray-400 hidden">
+            まだフォローがありません
+          </div>
+        </div>
+
+        
+        <!-- Want panel -->
+        <div id="fav-panel-want" class="hidden">
+          <div class="text-xs text-gray-500 leading-relaxed">
+            <span class="ms align-[-2px] text-gray-400">star</span>「行きたい」に入れた投稿の一覧です。
+          </div>
+
+          <div id="fav-want-timeline" class="mt-3 -mx-4 border-y border-gray-100 bg-white"></div>
+
+          <div id="fav-want-empty" class="mt-10 text-center text-sm text-gray-400 hidden">
+            まだ「行きたい」がありません
+          </div>
+        </div>
+
+<!-- Follow panel -->
+        <div id="fav-panel-follow">
+          <div class="text-xs text-gray-500 leading-relaxed">
+            フォローは「アクション扱い」なので、SMSログイン後に確定できます。<br>
+            ※会員登録だけでも、投稿は全部閲覧できます。
+          </div>
+
+          
+          <div class="mt-4 -mx-4 border-y border-gray-100 bg-white">
+            <div class="px-4 py-3 flex items-center justify-between gap-3 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-[var(--brand)] rounded-full">
+                  <span class="ms">auto_awesome</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-black text-sm truncate">SocioVoice 新橋</div>
+                  <div class="text-xs text-gray-500">運営</div>
+                </div>
+              </div>
+              <button class="px-3 py-2 text-xs font-black border border-gray-300 rounded-full text-[var(--brand)] tap" data-action="requires-verify" onclick="toggleFollow(this,'ops_shinbashi')">フォロー</button>
+            </div>
+
+            <div class="px-4 py-3 flex items-center justify-between gap-3 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-[var(--brand)] rounded-full">
+                  <span class="ms">bakery_dining</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-black text-sm truncate">立呑み「銀の樽」</div>
+                  <div class="text-xs text-gray-500">SHOP</div>
+                </div>
+              </div>
+              <button class="px-3 py-2 text-xs font-black border border-gray-300 rounded-full text-[var(--brand)] tap" data-action="requires-verify" onclick="toggleFollow(this,'bar_ginnotaru')">フォロー</button>
+            </div>
+
+            <div class="px-4 py-3 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 bg-gray-800 text-white flex items-center justify-center rounded-full">
+                  <span class="ms">restaurant</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-black text-sm truncate">串焼き しんばし太郎</div>
+                  <div class="text-xs text-gray-500">SHOP</div>
+                </div>
+              </div>
+              <button class="px-3 py-2 text-xs font-black border border-gray-300 rounded-full text-[var(--brand)] tap" data-action="requires-verify" onclick="toggleFollow(this,'kushiyaki_taro')">フォロー</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Liked panel -->
+        <div id="fav-panel-liked" class="hidden">
+          <div class="text-xs text-gray-500 leading-relaxed">
+            ♡（いいね）した投稿がここに残ります。
+          </div>
+
+          <div id="liked-posts" class="mt-3 -mx-4 border-y border-gray-100 bg-white"></div>
+
+          <div id="liked-empty" class="mt-10 text-center text-sm text-gray-400">
+            まだ「いいね」がありません
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  
+  <!-- SEARCH TAB -->
+  <section id="screen-search" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-4 py-3 flex justify-between items-center">
+        <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+        <div class="flex items-center gap-2">
+        <button class="tap notif-btn" onclick="openNotifications()" aria-label="通知">
+          <span class="ms text-[26px] text-gray-500">notifications</span>
+          <span class="notif-badge hidden">0</span>
+        </button>
+        <button class="tap" onclick="openAccount()" aria-label="アカウント">
+          <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+            <span class="ms text-[22px]">person</span>
+          </div>
+        </button>
+      </div>
+      </header>
+
+      <div class="px-4 pt-4 pb-24">
+        <div class="flex items-center gap-2 border border-gray-200 bg-white rounded-sm px-3 py-2">
+          <span class="ms text-gray-400">search</span>
+          <input id="search-input" class="w-full outline-none text-sm" placeholder="投稿・店舗・キーワードを検索" oninput="onSearchInput(this.value)" />
+          <button class="tap text-gray-400" onclick="clearSearch()" aria-label="クリア"><span class="ms">close</span></button>
+        </div>
+
+        <div id="search-suggest" class="mt-4"></div>
+
+        <div class="mt-4">
+          <div class="text-xs text-gray-500">検索結果</div>
+          <div id="search-results" class="mt-2 border-t border-gray-100"></div>
+          <div id="search-empty" class="hidden text-sm text-gray-400 mt-6">該当する投稿はありません</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- NOTIFICATIONS TAB -->
+  
+<section id="screen-plan" class="screen">
+  <div class="screen-scroll">
+    <header class="header px-4 py-3 flex justify-between items-center">
+      <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+      <div class="flex items-center gap-2">
+        <button class="tap notif-btn" onclick="openNotifications()" aria-label="通知">
+          <span class="ms text-[26px] text-gray-500">notifications</span>
+          <span class="notif-badge hidden">0</span>
+        </button>
+        <button class="tap" onclick="openAccount()" aria-label="アカウント">
+          <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+            <span class="ms text-[22px]">person</span>
+          </div>
+        </button>
+      </div>
+    
+</header>
+
+    <div class="px-4 pt-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-1 text-xs text-gray-500 font-black">
+          <span class="ms text-[18px]">military_tech</span>
+          <span id="plan-rank-label">ランク 1</span>
+        </div>
+        <button class="tap px-3 py-2 text-xs font-black rounded-sm border border-gray-200 bg-white text-gray-700 flex items-center gap-1" onclick="openCreatePlan()" aria-label="企画を作成">
+          <span class="ms text-[18px]">add</span>
+          企画を作成
+        </button>
+      </div>
+    </div>
+
+    <div class="px-4 pt-3 pb-24">
+
+      <div class="text-base font-black text-gray-900">企画</div>
+      <div class="text-xs text-gray-500 mt-1 leading-relaxed">
+        新橋の「縛り」で遊ぶ。投稿→行動につながるかを測る入口。
+      </div>
+
+      <div class="mt-4 p-4 rounded-xl border border-gray-100 bg-white">
+        <div class="text-xs text-gray-500 font-bold">今日の企画</div>
+        <div class="text-sm font-black mt-1">終電まで：立ち飲み縛り（〜3,000円）</div>
+        <div class="text-xs text-gray-500 mt-1">「行きたい」→現地で1投稿（またはチェックイン）で完走。</div>
+        <div class="mt-3 flex gap-2">
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>joinTodayPlan())">参加</button>
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="openPlanDetail('today')">詳細</button>
+        </div>
+      </div>
+
+
+      <div id="plan-joined" class="mt-4 p-4 rounded-xl border border-gray-100 bg-white hidden">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-xs text-gray-500 font-bold">参加中</div>
+            <div class="text-sm font-black mt-1">終電まで：立ち飲み縛り（〜3,000円）</div>
+            <div id="plan-progress" class="text-xs text-gray-500 mt-1">あと1ステップ：投稿（またはチェックイン）</div>
+          </div>
+          <div class="w-9 h-9 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+            <span class="ms">flag</span>
+          </div>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>{ openComposer({planId: state.plan?.planId || 'today'}); toast('投稿画面へ（企画参加中）'); })">投稿する</button>
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="guardAction(()=>completeTodayPlan())">完走</button>
+        </div>
+      </div>
+
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">みんなの企画</div>
+        <div id="plan-list" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="screen-plan-detail" class="screen">
+  <div class="screen-scroll">
+    <header class="header px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button class="tap text-gray-500 px-2 py-2" onclick="closePlanDetail()" aria-label="戻る"><span class="ms">arrow_back</span></button>
+        <div class="font-black text-base text-gray-900">企画詳細</div>
+      </div>
+      <button class="tap" onclick="openAccount()" aria-label="アカウント">
+        <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+          <span class="ms text-[22px]">person</span>
+        </div>
+      </button>
+    </header>
+
+    <div class="px-4 pt-4 pb-24">
+      <div class="p-4 rounded-xl border border-gray-100 bg-white">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-xs text-gray-500 font-bold" id="plan-detail-kicker">—</div>
+            <div class="text-lg font-black mt-1 leading-snug" id="plan-detail-title">—</div>
+            <div class="text-xs text-gray-500 mt-1" id="plan-detail-sub">—</div>
+          </div>
+          <div class="w-10 h-10 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+            <span class="ms" id="plan-detail-icon">flag</span>
+          </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-2" id="plan-detail-rules"></div>
+
+        <div class="mt-4 flex gap-2">
+          <button id="plan-detail-joinbtn" class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>joinPlanFromDetail())">参加</button>
+          <button id="plan-detail-postbtn" class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="guardAction(()=>postInPlanFromDetail())">企画に投稿</button>
+        </div>
+
+        <div class="mt-3 text-[11px] text-gray-500 leading-relaxed">
+          参加はログ取得のため。投稿は既存の投稿フォームを流用して、企画に紐づける（Mock）。
+        </div>
+      
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">この企画の投稿</div>
+        <div id="plan-detail-feed" class="space-y-3"></div>
+        <div id="plan-detail-empty" class="hidden text-sm text-gray-400 mt-6">まだ投稿がありません</div>
+      </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<section id="screen-notif" class="screen">
+  <div class="screen-scroll">
+    <header class="header px-4 py-3 flex justify-between items-center">
+<div class="flex items-center gap-2">
+    <button class="tap text-gray-500 px-2 py-2" onclick="closeNotifications()" aria-label="戻る"><span class="ms">arrow_back</span></button>
+    <div class="font-black text-base text-gray-900">通知</div>
+  </div>
+  <button class="tap" onclick="openAccount()" aria-label="アカウント">
+    <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+      <span class="ms text-[22px]">person</span>
+    </div>
+  </button>
+</header>
+
+    <div class="px-4 pt-3 pb-24">
+      <div id="notif-list" class="border-t border-gray-100"></div>
+      <div id="notif-empty" class="hidden text-sm text-gray-400 mt-8">通知はありません</div>
+    </div>
+  </div>
+</section>
+
+  <!-- ACCOUNT TAB -->
+  
+<section id="screen-account" class="screen">
+  <div class="screen-scroll">
+    <header class="header px-4 py-3 flex justify-between items-center">
+        <div class="sv-wordmark sv-wordmark--header text-[var(--brand)]">SOCIO<span class="sv-gap"></span>VOICE</div>
+        <button class="tap" onclick="closeAccount()" aria-label="アカウント">
+          <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+            <span class="ms text-[22px]">person</span>
+          </div>
+        </button>
+      </header>
+
+    <div class="px-4 pt-4 pb-24">
+      <div class="text-xs text-gray-500">現在の利用状態</div>
+      <div class="font-black text-base mt-1" id="status-label">—</div>
+      <div class="text-xs text-gray-500 mt-1" id="status-desc">—</div>
+
+      <div class="mt-5 border-t border-gray-100">
+        <button class="w-full flex items-center justify-between py-4 border-b border-gray-100 tap" onclick="goVerifyFromAccount()">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center"><span class="ms text-[20px]">verified_user</span></div>
+            <div class="text-sm font-black">SMSログイン</div>
+          </div>
+          <span class="ms text-gray-400">chevron_right</span>
+        </button>
+
+        <div class="py-4 border-b border-gray-100">
+          <div class="text-xs text-gray-500 mb-2">アカウント切替</div>
+          <div class="flex gap-2">
+            <button class="tap px-3 py-2 border border-gray-200 rounded-sm text-sm font-black" onclick="switchPersona('personal')">個人</button>
+            <button class="tap px-3 py-2 border border-gray-200 rounded-sm text-sm font-black" onclick="switchPersona('shop:365')">店舗</button>
+          </div>
+          <div class="text-xs text-gray-400 mt-2">※モック：実運用は招待制を想定</div>
+        </div>
+
+        <div class="py-4 border-b border-gray-100">
+          <div class="text-xs text-gray-500 mb-2">デバッグ（モック検証用）</div>
+          <div class="flex flex-wrap gap-2">
+            <button class="tap px-3 py-2 border border-gray-200 rounded-sm text-sm" onclick="setStatus('guest')">guest</button>
+            <button class="tap px-3 py-2 border border-gray-200 rounded-sm text-sm" onclick="setStatus('member')">member</button>
+            <button class="tap px-3 py-2 border border-gray-200 rounded-sm text-sm" onclick="setStatus('verified')">verified</button>
+          </div>
+        </div>
+
+        <div class="py-4 border-b border-gray-100">
+          <div class="text-xs text-gray-500 mb-2">設定</div>
+          <div class="space-y-2">
+            <button class="w-full flex items-center justify-between py-2 tap" onclick="toast('ニックネーム変更（Mock）')">
+              <div class="text-sm">ニックネーム変更</div><span class="ms text-gray-400">chevron_right</span>
+            </button>
+            <button class="w-full flex items-center justify-between py-2 tap" onclick="toast('通知設定（Mock）')">
+              <div class="text-sm">通知設定</div><span class="ms text-gray-400">chevron_right</span>
+            </button>
+            <button class="w-full flex items-center justify-between py-2 tap" onclick="toast('ログアウト（Mock）')">
+              <div class="text-sm">ログアウト</div><span class="ms text-gray-400">chevron_right</span>
+            </button>
+            <button class="w-full flex items-center justify-between py-2 tap" onclick="toast('退会（Mock）')">
+              <div class="text-sm text-rose-600 font-black">退会</div><span class="ms text-gray-400">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <div class="text-xs text-gray-500 mb-2">お店アカウント</div>
+        <div class="border border-gray-200 rounded-sm p-4 bg-gray-50">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-black">お店アカウントを追加</div>
+              <div class="text-xs text-gray-500 mt-1">法人番号→招待制（治安と信頼）</div>
+            </div>
+            <button class="tap text-gray-500" onclick="openSwitcher()" aria-label="アカウント切替">
+              <span class="ms">swap_horiz</span>
+            </button>
+          </div>
+          <button class="btn-primary w-full mt-3" onclick="openSwitcher()">追加/切替を開く</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <!-- POST DETAIL -->
+
+  
+  <section id="screen-post" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-3 py-3 flex items-center gap-2">
+        <button class="tap text-gray-500 px-2 py-2" onclick="backFromPost()"><span class="ms">arrow_back</span></button>
+        <div class="font-black text-base text-gray-900">投稿詳細</div>
+      </header>
+      <div id="post-detail" class="px-0"></div>
+    </div>
+  </section>
+
+  <!-- COMPOSER -->
+  <section id="screen-compose" class="screen">
+    <div class="screen-scroll">
+      <header class="header px-3 py-3 flex items-center justify-between">
+        <button class="tap text-gray-500 px-2 py-2" onclick="closeComposer()"><span class="ms">close</span></button>
+        <div class="font-black text-base text-gray-900">投稿作成</div>
+        <button class="tap px-3 py-2 text-xs font-black rounded-sm bg-[var(--brand)] text-white" onclick="submitPost()" data-action="requires-verify">投稿</button>
+      </header>
+
+      <div class="px-4 pt-4">
+        <div class="border border-gray-200 rounded-sm p-4">
+          <div class="text-xs text-gray-500">発信者</div>
+          <div class="font-black text-sm mt-1" id="compose-author">—</div>
+        </div>
+        <div id="compose-planbox" class="mt-3 border border-gray-200 rounded-sm px-4 py-3 bg-white hidden">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="ms text-gray-500">flag</span>
+              <div class="min-w-0">
+                <div class="text-[11px] font-black text-gray-500">企画に投稿</div>
+                <div id="compose-planname" class="text-sm font-black text-gray-900 truncate">—</div>
+              </div>
+            </div>
+            <button class="tap px-2 py-2 text-gray-500" aria-label="企画を外す" onclick="clearComposePlan()"><span class="ms">close</span></button>
+          </div>
+        </div>
+
+
+        <div class="mt-3 border border-gray-200 rounded-sm p-4">
+          <div class="text-xs font-black text-gray-500 mb-2">投稿タイプ</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('normal')" id="type-normal">通常</button>
+            <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('report')" id="type-report">今夜レポ</button>
+            <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('petition')" id="type-petition">注意</button>
+          </div>
+        </div>
+
+        <div class="mt-3 border border-gray-200 rounded-sm p-4">
+          <div class="text-xs font-black text-gray-500 mb-3">評価（任意）</div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">paid</span> コスパ
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-cost-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('cost',1)">安い</button>
+                <button id="rate-cost-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('cost',2)">ふつう</button>
+                <button id="rate-cost-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('cost',3)">高め</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">schedule</span> タイパ
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-time-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('time',1)">早い</button>
+                <button id="rate-time-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('time',2)">ふつう</button>
+                <button id="rate-time-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('time',3)">遅い</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">groups</span> 雰囲気
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-vibe-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('vibe',1)">静か</button>
+                <button id="rate-vibe-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('vibe',2)">ふつう</button>
+                <button id="rate-vibe-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('vibe',3)">賑やか</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-[11px] text-gray-400 leading-relaxed">
+            ※同じボタンをもう一度押すと解除できます（任意）。
+          </div>
+        </div>
+
+        <div class="mt-3 border border-gray-200 rounded-sm p-4">
+          <div class="text-xs font-black text-gray-500 mb-2">本文</div>
+          <textarea id="compose-text" class="w-full min-h-[140px] px-3 py-3 border border-gray-200 rounded-sm text-sm focus:outline-none focus:border-[var(--brand)]" placeholder="街の情報・相談・お知らせなど…（Mock）"></textarea>
+
+          <div class="mt-3 flex items-center justify-between">
+            <label class="flex items-center gap-2 text-xs font-black text-gray-600 cursor-pointer">
+              <input id="compose-pinmap" type="checkbox" class="accent-[var(--brand)]" />
+              任意でピン留めマップを添付（投稿内で完結）
+            </label>
+            <button class="text-xs font-black text-gray-500 border border-gray-200 px-3 py-2 rounded-sm" onclick="toast('写真追加（Mock）')" data-action="requires-verify">
+              <span class="ms" style="font-size:18px">add_photo_alternate</span> 写真
+            </button>
+          </div>
+
+          <div class="mt-3 hidden" id="pinmap-preview">
+            <div class="text-[11px] text-gray-500 mb-2">ピン留めマップ（Mock）</div>
+            <div class="img-placeholder w-full aspect-video rounded-sm">[Pinned Map]</div>
+            <div class="text-[11px] text-gray-400 mt-2">※横つながり無し。1投稿内で完結。</div>
+          </div>
+        </div>
+
+        <div class="mt-3 mb-6 text-xs text-gray-500 leading-relaxed">
+          ※投稿・リアクション・同意・フォロー等の“アクション”は、SMSログイン後に解放されます。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODALS -->
+  <!-- Action guard: SMS needed -->
+  <div id="auth-modal" class="modal fixed inset-0 z-[120] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-8 shadow-xl text-center">
+      <div class="w-12 h-12 bg-[var(--brand)] text-white flex items-center justify-center rounded-full mx-auto mb-4">
+        <span class="ms">sms</span>
+      </div>
+      <h3 class="font-black text-gray-900 mb-2">SMSログインが必要です</h3>
+      <p class="text-xs text-gray-500 leading-relaxed mb-6">
+        このアクションは、SMSログイン後に解放されます。<br>（荒らし防止のため）
+      </p>
+      <button class="bg-[var(--brand)] text-white font-black w-full py-3 rounded-sm mb-3" onclick="openSMSFlow()">SMS認証へ進む</button>
+      <button class="text-xs text-gray-400" onclick="closeModal('auth-modal')">キャンセル</button>
+    </div>
+  </div>
+
+    <!-- SMS verification modal -->
+  <div id="sms-modal" class="modal fixed inset-0 z-[130] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900">SMS認証</div>
+        <button class="tap text-gray-500" onclick="closeModal('sms-modal')"><span class="ms">close</span></button>
+      </div>
+
+      <!-- step 1: phone -->
+      <div id="sms-step-1" class="mt-4">
+        <div class="w-12 h-12 rounded-full bg-[var(--brand)] text-white flex items-center justify-center">
+          <span class="ms">sms</span>
+        </div>
+        <div class="font-black text-sm mt-3">電話番号でログイン</div>
+        <div class="text-xs text-gray-500 mt-1 leading-relaxed">
+          投稿・コメント・通報・「行きたい」はSMS認証後に解放されます（Mock）。
+        </div>
+
+        <label class="text-xs font-black text-gray-400 block mt-4 mb-1">電話番号（日本）</label>
+        <input id="sms-phone" type="tel" class="w-full px-3 py-3 border border-gray-200 rounded-sm text-base focus:outline-none focus:border-[var(--brand)]" placeholder="09012345678" />
+        <button class="mt-4 w-full py-3 bg-gray-900 text-white font-black rounded-sm" onclick="smsSendCode()">コードを送信（Mock）</button>
+        <button class="mt-3 w-full py-3 bg-white text-gray-700 font-black border border-gray-200 rounded-sm" onclick="closeModal('sms-modal')">あとで</button>
+      </div>
+
+      <!-- step 2: code -->
+      <div id="sms-step-2" class="mt-4 hidden">
+        <div class="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center">
+          <span class="ms">password</span>
+        </div>
+        <div class="font-black text-sm mt-3">届いた6桁コードを入力</div>
+        <div class="text-xs text-gray-500 mt-1 leading-relaxed">
+          ※モックでは <span class="font-black text-gray-700">123456</span> を入力してください
+        </div>
+
+        <label class="text-xs font-black text-gray-400 block mt-4 mb-1">確認コード</label>
+        <input id="sms-code" inputmode="numeric" maxlength="6" class="w-full px-3 py-3 border border-gray-200 rounded-sm text-base tracking-widest text-center font-black focus:outline-none focus:border-[var(--brand)]" placeholder="123456" />
+        <button class="mt-4 w-full py-3 bg-[var(--brand)] text-white font-black rounded-sm" onclick="smsVerifyCode()">ログイン</button>
+        <button class="mt-3 w-full py-3 bg-white text-gray-700 font-black border border-gray-200 rounded-sm" onclick="smsBack()">戻る</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Account switcher -->
+  
+  <!-- Rank guard: plan creation -->
+  <div id="rank-modal" class="modal fixed inset-0 z-[125] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900 flex items-center gap-2">
+          <span class="ms text-[20px] text-[var(--brand)]">military_tech</span>
+          企画作成の条件
+        </div>
+        <button class="tap text-gray-500" onclick="closeModal('rank-modal')" aria-label="閉じる"><span class="ms">close</span></button>
+      </div>
+
+      <div class="mt-4 border border-gray-200 rounded-sm p-4 bg-white">
+        <div class="text-xs text-gray-500 font-black">現在のランク</div>
+        <div class="text-2xl font-black text-gray-900 mt-1" id="rank-modal-current">ランク 1</div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">企画を作成するには</div>
+        <div class="flex items-start gap-3 p-3 border border-gray-200 rounded-sm">
+          <span class="ms text-[20px] text-gray-600">check_circle</span>
+          <div class="min-w-0">
+            <div class="text-sm font-black text-gray-900">ランク10以上</div>
+            <div class="text-xs text-gray-500 mt-1 leading-relaxed">
+              投稿・企画完走など、活動量が一定以上になるとランクが上がります。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">ランクを上げる例</div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">edit</span>
+            投稿する
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">task_alt</span>
+            企画を完走する
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">forum</span>
+            コメントで参加する
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button class="bg-[var(--brand)] text-white font-black w-full py-3 rounded-sm" onclick="closeModal('rank-modal')">了解</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan create modal (MVP) -->
+  <div id="plan-create-modal" class="modal fixed inset-0 z-[126] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900 flex items-center gap-2">
+          <span class="ms text-[20px] text-[var(--brand)]">add</span>
+          企画を作成
+        </div>
+        <button class="tap text-gray-500" onclick="closeModal('plan-create-modal')" aria-label="閉じる"><span class="ms">close</span></button>
+      </div>
+
+      <div class="mt-4">
+        <label class="text-xs text-gray-500 font-black">企画名</label>
+        <input id="plan-create-title" class="mt-2 w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：終電まで：はしご縛り（2軒）" />
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">縛り（最大3つ）</div>
+        <div class="space-y-2">
+          <input id="plan-create-rule1" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：新橋エリア" />
+          <input id="plan-create-rule2" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：予算〜3,000円" />
+          <input id="plan-create-rule3" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：立ち飲み優先" />
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button class="bg-[var(--brand)] text-white font-black w-full py-3 rounded-sm" onclick="submitCreatePlan()">作成</button>
+        <button class="mt-3 w-full py-2 text-xs text-gray-400" onclick="closeModal('plan-create-modal')">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="switcher-modal" class="modal fixed inset-0 z-[125] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-5 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900">アカウント切替</div>
+        <button class="tap text-gray-500" onclick="closeModal('switcher-modal')"><span class="ms">close</span></button>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 mb-2">個人</div>
+        <button class="w-full border border-gray-200 rounded-sm p-4 flex items-center justify-between tap" onclick="switchPersona('personal')">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><span class="ms">person</span></div>
+            <div>
+              <div class="font-black text-sm" id="personal-name">—</div>
+              <div class="text-xs text-gray-500">個人アカウント</div>
+            </div>
+          </div>
+          <div class="text-xs font-black text-gray-500" id="personal-active">ACTIVE</div>
+        </button>
+
+        <div class="text-xs text-gray-500 mt-4 mb-2">店舗</div>
+        <div id="switcher-shops" class="space-y-2"></div>
+
+        <div class="text-[11px] text-gray-500 leading-relaxed mt-4">
+          ※店舗は法人番号で登録 → 完了後は招待制（Mock）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Original Text Modal (AI整形の元投稿表示) -->
+  <div id="original-modal" class="modal fixed inset-0 z-[120] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 bg-gray-900 text-white flex items-center justify-center rounded-full">
+            <span class="material-symbols-rounded text-[18px]">visibility</span>
+          </div>
+          <div>
+            <h3 class="font-black text-gray-900 text-sm leading-tight">元の投稿</h3>
+            <p class="text-[11px] text-gray-500">本人の入力（オリジナル）</p>
+          </div>
+        </div>
+        <button class="text-gray-400 hover:text-gray-600" onclick="closeModal('original-modal')">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      <div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap" id="original-text"></div>
+      <div class="mt-4">
+        <button class="w-full bg-gray-900 text-white font-black py-3 rounded-sm" onclick="closeModal('original-modal')">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Post Menu Modal -->
+  <div id="postmenu-modal" class="modal fixed inset-0 items-end justify-center bg-black/40 z-[180]">
+    <div class="w-full max-w-[414px] bg-white rounded-t-2xl px-4 pt-3 pb-5">
+      <div class="w-10 h-1.5 bg-gray-200 rounded-full mx-auto mb-3"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="min-w-0">
+          <div class="text-sm font-black text-gray-900 truncate" id="postmenu-author">投稿メニュー</div>
+          <div class="text-[11px] text-gray-500" id="postmenu-sub">この投稿に対する操作</div>
+        </div>
+        <button class="icon-only" onclick="closeModal('postmenu-modal')" aria-label="閉じる">
+          <span class="ms">close</span>
+        </button>
+      </div>
+
+      <div class="grid gap-2">
+        <button class="w-full flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 text-left"
+                data-action="requires-verify"
+                onclick="postMenuShare()">
+          <div class="flex items-center gap-3">
+            <span class="ms" style="font-size:22px">share</span>
+            <div>
+              <div class="text-sm font-black text-gray-900">共有</div>
+              <div class="text-[11px] text-gray-500">リンクをコピー（端末共有があれば起動）</div>
+            </div>
+          </div>
+          <span class="ms text-gray-400">chevron_right</span>
+        </button>
+
+        <button class="w-full flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 text-left"
+                data-action="requires-verify"
+                onclick="postMenuToggleMute()">
+          <div class="flex items-center gap-3">
+            <span class="ms" style="font-size:22px">volume_off</span>
+            <div>
+              <div class="text-sm font-black text-gray-900" id="postmenu-mute-label">ミュート</div>
+              <div class="text-[11px] text-gray-500">この投稿者の表示を減らす</div>
+            </div>
+          </div>
+          <span class="ms text-gray-400">chevron_right</span>
+        </button>
+
+        <button class="w-full flex items-center justify-between border border-rose-200 bg-rose-50 rounded-xl px-4 py-3 text-left"
+                data-action="requires-verify"
+                onclick="postMenuReport()">
+          <div class="flex items-center gap-3">
+            <span class="ms" style="font-size:22px">report</span>
+            <div>
+              <div class="text-sm font-black text-rose-700">通報</div>
+              <div class="text-[11px] text-rose-700/70">不適切な内容として運営に送る（Mock）</div>
+            </div>
+          </div>
+          <span class="ms text-rose-400">chevron_right</span>
+        </button>
+
+        <button class="w-full mt-2 bg-gray-100 text-gray-700 font-black py-3 rounded-xl" onclick="closeModal('postmenu-modal')">
+          キャンセル
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Global Bottom Tabs (Home / Favorites / Search / Notifications) -->
+  <nav id="global-tabbar" class="tabbar hidden" aria-label="ボトムタブ">
+    <button class="tabbtn" data-tab="home" onclick="goTab('home')"><span class="ms">home</span><span>ホーム</span></button>
+    <button class="tabbtn" data-tab="follow" onclick="goTab('follow')"><span class="ms">favorite</span><span>お気に入り</span></button>
+    <button class="tabbtn" data-tab="search" onclick="goTab('search')"><span class="ms">search</span><span>検索</span></button>
+    <button class="tabbtn" data-tab="plan" onclick="goTab('plan')"><span class="ms">event</span><span>企画</span></button>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden absolute left-1/2 -translate-x-1/2 bottom-[108px] z-[200] bg-gray-900 text-white text-xs font-black px-4 py-2 rounded-full shadow"></div>
+
+</div>
+
+<script>
+  // ---------- State ----------
+  const state = {
+    status: 'guest', // guest | member | verified(SMS)
+    homeStream: 'town',
+    nickname: 'ヒロシ',
+    avatarSeed: 1,
+    rank: 1,
+    customPlans: [],
+    activeTab: 'home',
+    plan: { joined:false, completed:false },
+    favMode: 'liked', // feed | want | liked | follow
+    persona: 'personal', // personal or shop:<id>
+    shops: [
+      // {id:'shop1', name:'居酒屋ヒロシ', corp:'1234567890123', invitedStaff:true}
+    ],
+    follows: new Set(),
+    mutedAuthors: new Set(),
+    reportedPosts: new Set(),
+    wants: new Set(),
+    notifications: [],
+    searchQuery: '',
+    menuPostId: null,
+    posts: [],
+    lastScreenBeforePost: 'home',
+    compose: { type:'normal', planId:null, planTitle:null, ratings:{cost:null,time:null,vibe:null} },
+    profile: {
+      optionalAttrs: [],
+      showOptionalAttrs: true,
+      lastNicknameChange: 0
+    }
+  };
+
+
+  // ---------- Rank (MVP) ----------
+  function getRank(){
+    const r = Number(state.rank || 1);
+    return Number.isFinite(r) ? r : 1;
+  }
+  function bumpRank(delta){
+    const d = Number(delta || 0);
+    const next = Math.max(1, getRank() + (Number.isFinite(d) ? d : 0));
+    state.rank = next;
+    updateRankUI();
+  }
+  function updateRankUI(){
+    const txt = 'ランク ' + String(getRank());
+    const a = document.getElementById('plan-rank-label');
+    if(a) a.textContent = txt;
+    const b = document.getElementById('rank-modal-current');
+    if(b) b.textContent = txt;
+    const c = document.getElementById('account-rank');
+    if(c) c.textContent = txt;
+  }
+
+
+  // ---------- Navigation ----------
+  function setTabbarVisibility(screenId){
+    const tb = document.getElementById('global-tabbar');
+    if(!tb) return;
+    const show = ['home','follow','search','plan','notif','account'].includes(screenId);
+    tb.classList.toggle('hidden', !show);
+  }
+
+  function nav(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const target = document.getElementById('screen-'+id);
+    if(target) target.classList.add('active');
+    setTabbarVisibility(id);
+  }
+  
+function goTab(tab){
+    state.activeTab = tab;
+    const map = { home:'home', follow:'follow', search:'search', plan:'plan' };
+    nav(map[tab] || 'home');
+    updateTabbars();
+    if(tab==='home'){ renderHomeBanner();
+    updateNotifBadges(); renderTimeline(); }
+    if(tab==='follow'){ renderFavScreen(); }
+    if(tab==='plan'){ renderPlan(); }
+    if(tab==='search'){ renderSearch(); }
+  }
+  function updateTabbars(){
+    const root = document.getElementById('global-tabbar');
+    if(!root) return;
+    root.querySelectorAll('.tabbtn').forEach(b=>{
+      const t = b.getAttribute('data-tab');
+      if(t===state.activeTab) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  }
+
+
+  function openAccount(){
+    nav('account');
+    renderAccount();
+  }
+  function closeAccount(){
+    const map = { home:'home', follow:'follow', search:'search', plan:'plan' };
+    nav(map[state.activeTab] || 'home');
+  }
+
+  // ---------- Notifications ----------
+  
+function getUnreadNotifCount(){
+    ensureSeededNotifications();
+    updateNotifBadges();
+    const items = state.notifications || [];
+    return items.filter(n=>!n.read).length;
+  }
+  function updateNotifBadges(){
+    const n = getUnreadNotifCount();
+    document.querySelectorAll('.notif-badge').forEach(el=>{
+      if(!el) return;
+      el.textContent = String(n);
+      el.classList.toggle('hidden', n<=0);
+    });
+  }
+  function openNotifications(){
+    // Keep activeTab highlight; show notif screen as overlay-ish
+    state._prevScreenBeforeNotif = state.activeTab || 'home';
+    nav('notif');
+    renderNotif();
+    // Mark all read (MVP)
+    (state.notifications||[]).forEach(x=>x.read=true);
+    updateNotifBadges();
+  }
+  function closeNotifications(){
+    const back = state._prevScreenBeforeNotif || (state.activeTab||'home');
+    nav(back);
+    // rerender current tab
+    if(state.activeTab==='home'){ renderHomeBanner(); renderTimeline(); }
+    if(state.activeTab==='follow'){ renderFavScreen(); }
+    if(state.activeTab==='search'){ renderSearch(); }
+    if(state.activeTab==='plan'){ renderPlan(); }
+  }
+
+
+
+function renderPlan(){
+    const list = document.getElementById('plan-list');
+    if(!list) return;
+
+    const PLAN_DEFS = getPlanDefs();
+    updateRankUI();
+
+    // joined block (MVP)
+    const joined = document.getElementById('plan-joined');
+    const prog = document.getElementById('plan-progress');
+    const joinedTitle = joined?.querySelector('.text-sm.font-black.mt-1');
+    if(joined){
+      const isJoined = !!(state.plan && state.plan.joined);
+      joined.classList.toggle('hidden', !isJoined);
+      if(joinedTitle && isJoined){
+        joinedTitle.textContent = state.plan.title || PLAN_DEFS[state.plan.planId || 'today']?.title || '企画';
+      }
+      if(prog){
+        prog.textContent = (state.plan && state.plan.completed)
+          ? '完走しました。おつかれ！'
+          : 'あと1ステップ：投稿（またはチェックイン）';
+      }
+    }
+
+    // list
+    const plans = Object.values(PLAN_DEFS).filter(p=>p.id!=='today');
+    list.innerHTML = plans.map(p=>`
+      <div class="p-3 rounded-xl border border-gray-100 bg-white flex gap-3 items-start tap" onclick="openPlanDetail('${p.id}')">
+        <div class="w-9 h-9 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+          <span class="ms">${p.icon}</span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-black truncate">${escapeHtml(p.title)}</div>
+          <div class="text-xs text-gray-500 mt-0.5">${escapeHtml(p.sub)}</div>
+        </div>
+        <div class="shrink-0 flex items-center">
+          <button class="tap px-2 py-2 text-gray-500" aria-label="詳細" onclick="event.stopPropagation(); openPlanDetail('${p.id}')"><span class="ms">chevron_right</span></button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+
+
+function getPlanDefs(){
+    const base = {
+      today: {
+        id:'today',
+        kicker:'今日の企画',
+        title:'終電まで：立ち飲み縛り（〜3,000円）',
+        sub:'「行きたい」→現地で1投稿（またはチェックイン）で完走。',
+        icon:'flag',
+        rules:['新橋エリア','予算〜3,000円','立ち飲み優先']
+      },
+      senbero: {
+        id:'senbero',
+        kicker:'みんなの企画',
+        title:'せんべろ縛り（〜2,000円）',
+        sub:'0次会に強い。1軒だけでもOK。',
+        icon:'payments',
+        rules:['予算〜2,000円','1軒でもOK','写真推奨']
+      },
+      smoke: {
+        id:'smoke',
+        kicker:'みんなの企画',
+        title:'喫煙・禁煙で分岐（好み一致）',
+        sub:'同じ派閥で行動しやすくする。',
+        icon:'smoke_free',
+        rules:['喫煙可 or 禁煙','店の雰囲気重視','写真推奨']
+      }
+    };
+
+    const customs = {};
+    (state.customPlans || []).forEach(p=>{
+      if(!p || !p.id) return;
+      customs[p.id] = p;
+    });
+
+    return { ...base, ...customs };
+  }
+
+function joinPlan(planId){
+    const defs = getPlanDefs();
+    const d = defs[planId] || defs.today;
+    state.plan = state.plan || {};
+    state.plan.joined = true;
+    state.plan.completed = false;
+    state.plan.planId = d.id;
+    state.plan.title = d.title;
+    toast('参加しました');
+    renderPlan();
+  }
+
+function completePlan(){
+    state.plan = state.plan || {};
+    const wasCompleted = !!state.plan.completed;
+    if(!state.plan.joined){ state.plan.joined = true; }
+    state.plan.completed = true;
+    if(!wasCompleted) bumpRank(1);
+    toast('完走しました（Mock）');
+    renderPlan();
+  }
+
+function joinTodayPlan(){ joinPlan('today'); }
+function completeTodayPlan(){ completePlan(); }
+
+function openCreatePlan(){
+    // guest -> SMS login
+    if(state.status==='guest'){
+      state._afterSmsAction = { type:'createPlan' };
+      openModal('sms-modal');
+      smsReset();
+      return;
+    }
+    // rank gate
+    if(getRank() < 10){
+      updateRankUI();
+      openModal('rank-modal');
+      return;
+    }
+    // open create modal
+    const t = document.getElementById('plan-create-title');
+    const r1 = document.getElementById('plan-create-rule1');
+    const r2 = document.getElementById('plan-create-rule2');
+    const r3 = document.getElementById('plan-create-rule3');
+    if(t) t.value = '';
+    if(r1) r1.value = '';
+    if(r2) r2.value = '';
+    if(r3) r3.value = '';
+    openModal('plan-create-modal');
+  }
+
+function submitCreatePlan(){
+    if(state.status==='guest'){
+      state._afterSmsAction = { type:'createPlan' };
+      openModal('sms-modal');
+      smsReset();
+      return;
+    }
+    if(getRank() < 10){
+      updateRankUI();
+      closeModal('plan-create-modal');
+      openModal('rank-modal');
+      return;
+    }
+
+    const title = (document.getElementById('plan-create-title')?.value || '').trim();
+    const rule1 = (document.getElementById('plan-create-rule1')?.value || '').trim()
+    const rule2 = (document.getElementById('plan-create-rule2')?.value || '').trim()
+    const rule3 = (document.getElementById('plan-create-rule3')?.value || '').trim()
+
+    if(!title){
+      toast('企画名を入力してください');
+      return;
+    }
+
+    const rules = [rule1, rule2, rule3].filter(Boolean).slice(0,3);
+    const id = 'uplan_' + Date.now().toString(36);
+
+    const plan = {
+      id,
+      kicker:'みんなの企画',
+      title,
+      sub:'ユーザー作成の企画（Mock）',
+      icon:'flag',
+      rules: rules.length ? rules : ['ルール未設定']
+    };
+
+    if(!state.customPlans) state.customPlans = [];
+    state.customPlans.unshift(plan);
+    closeModal('plan-create-modal');
+    toast('企画を作成しました');
+    renderPlan();
+  }
+
+function openPlanDetail(planId){
+    state.planDetailId = planId || 'today';
+    renderPlanDetail();
+    nav('plan-detail');
+  }
+
+function closePlanDetail(){
+    goTab('plan');
+  }
+
+function renderPlanDetail(){
+    const defs = getPlanDefs();
+    const d = defs[state.planDetailId || 'today'] || defs.today;
+
+    const kicker = document.getElementById('plan-detail-kicker');
+    const title = document.getElementById('plan-detail-title');
+    const sub = document.getElementById('plan-detail-sub');
+    const icon = document.getElementById('plan-detail-icon');
+    const rules = document.getElementById('plan-detail-rules');
+    const joinBtn = document.getElementById('plan-detail-joinbtn');
+    const postBtn = document.getElementById('plan-detail-postbtn');
+
+    kicker && (kicker.textContent = d.kicker || '企画');
+    title && (title.textContent = d.title || '—');
+    sub && (sub.textContent = d.sub || '');
+    icon && (icon.textContent = d.icon || 'flag');
+    if(rules){
+      rules.innerHTML = (d.rules||[]).slice(0,6).map(r=>`
+        <span class="chip chip--outline"><span class="ms">label</span>${escapeHtml(r)}</span>
+      `).join('');
+    }
+
+    const joinedThis = !!(state.plan?.joined && (state.plan.planId===d.id));
+    if(joinBtn){
+      joinBtn.textContent = joinedThis ? '参加済み' : '参加';
+      joinBtn.disabled = joinedThis;
+      joinBtn.className = joinedThis
+        ? 'tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-gray-50 text-gray-400'
+        : 'tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white';
+    }
+    if(postBtn){
+      postBtn.textContent = '企画に投稿';
+    }
+
+    renderPlanDetailTimeline(d.id);
+  }
+
+
+function renderPlanDetailTimeline(planId){
+    ensureSeededPosts();
+    const feed = document.getElementById('plan-detail-feed');
+    const empty = document.getElementById('plan-detail-empty');
+    if(!feed) return;
+
+    let posts = (state.posts || []).filter(p=>p.planId===planId);
+
+    // Filter: reported posts (hidden)
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+
+    // Filter: muted authors (hidden)
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>{
+        const key = normalizeFollowKey(p.author?.name || '');
+        return !state.mutedAuthors.has(key);
+      });
+    }
+
+    // Guest: keep small preview
+    if(state.status==='guest'){
+      posts = posts.slice(0,2);
+    }
+
+    if(!posts.length){
+      feed.innerHTML = '';
+      empty && empty.classList.remove('hidden');
+      return;
+    }
+    empty && empty.classList.add('hidden');
+    feed.innerHTML = posts.map(p=>renderPostCard(p)).join('') + `<div class="h-2"></div>`;
+    bindPostOpeners();
+    bindGuards();
+  }
+
+function joinPlanFromDetail(){
+    joinPlan(state.planDetailId || 'today');
+    renderPlanDetail();
+  }
+
+function postInPlanFromDetail(){
+    const defs = getPlanDefs();
+    const d = defs[state.planDetailId || 'today'] || defs.today;
+    openComposer({planId:d.id, planTitle:d.title});
+    toast('企画に投稿（Mock）');
+  }
+
+
+function renderNotif(){
+    const list = document.getElementById('notif-list');
+    const empty = document.getElementById('notif-empty');
+    if(!list) return;
+    ensureSeededNotifications();
+    const items = state.notifications || [];
+    if(!items.length){
+      list.innerHTML = '';
+      empty && empty.classList.remove('hidden');
+      return;
+    }
+    empty && empty.classList.add('hidden');
+    list.innerHTML = items.map(n=>`
+      <div class="py-3 border-b border-gray-100 flex gap-3">
+        <div class="w-9 h-9 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+          <span class="ms">${n.icon || 'notifications'}</span>
+        </div>
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500">${escapeHtml(n.time || '')}</div>
+          <div class="text-sm font-black mt-0.5 truncate">${escapeHtml(n.title || '')}</div>
+          ${n.body ? `<div class="text-xs text-gray-500 mt-0.5 line-clamp-2">${escapeHtml(n.body)}</div>` : ``}
+        </div>
+      </div>
+    `).join('');
+  }
+  function markAllRead(){
+    guardAction(()=>toast('既読にしました（Mock）'));
+  }
+
+  // ---------- Search ----------
+  function focusSearch(){
+    const input = document.getElementById('search-input');
+    input && input.focus();
+  }
+  function clearSearch(){
+    const input = document.getElementById('search-input');
+    if(input) input.value = '';
+    state.searchQuery = '';
+    renderSearch();
+  }
+  function onSearchInput(v){
+    state.searchQuery = v;
+    renderSearch();
+  }
+  function renderSearch(){
+    const q = (state.searchQuery || '').trim();
+    const suggest = document.getElementById('search-suggest');
+    const results = document.getElementById('search-results');
+    const empty = document.getElementById('search-empty');
+    if(!suggest || !results) return;
+
+    // suggestions
+    const chips = ['空席','立ち飲み','ハッピーアワー','喫煙可','禁煙','二次会','終電前','串'];
+    suggest.innerHTML = `
+      <div class="text-xs text-gray-500">注目ワード</div>
+      <div class="mt-2 flex flex-wrap gap-2">
+        ${chips.map(c=>`<button class="tap px-3 py-1.5 border border-gray-200 rounded-sm text-xs" onclick="applySearch('${c}')">${c}</button>`).join('')}
+      </div>
+    `;
+
+    // results
+    ensureSeededPosts();
+    let posts = state.posts || [];
+    posts = posts.filter(p=>!state.reportedPosts?.has?.(p.id));
+    posts = posts.filter(p=>!state.mutedAuthors?.has?.(p.author?.id || p.author));
+    if(q){
+      const qq = q.toLowerCase();
+      posts = posts.filter(p=>{
+        const t = (p.public_text||'') + ' ' + (p.original_text||'') + ' ' + (p.author?.name||'');
+        return t.toLowerCase().includes(qq);
+      });
+    }else{
+      posts = [];
+    }
+
+    if(!posts.length){
+      results.innerHTML = '';
+      empty && empty.classList.remove('hidden');
+      return;
+    }
+    empty && empty.classList.add('hidden');
+
+    results.innerHTML = posts.slice(0,30).map(p=>`
+      <button class="w-full text-left py-3 border-b border-gray-100 tap" onclick="openPost('${p.id}')">
+        <div class="flex items-center justify-between gap-2">
+          <div class="text-sm font-black truncate">${escapeHtml(p.author?.name || '投稿')}</div>
+          <div class="text-[11px] text-gray-400">${formatPostTime(p)}</div>
+        </div>
+        <div class="text-sm text-gray-700 mt-1 line-clamp-2">${escapeHtml(p.public_text || '')}</div>
+      </button>
+    `).join('');
+  }
+  function applySearch(word){
+    const input = document.getElementById('search-input');
+    if(input){ input.value = word; }
+    state.searchQuery = word;
+    renderSearch();
+  }
+// ---------- Favorites (Follow TL / Follow / Liked) ----------
+  function setFavMode(mode){
+    state.favMode = mode;
+    renderFavScreen();
+  }
+
+  function renderFavScreen(){
+    const btnFeed = document.getElementById('fav-tab-feed');
+    const btnWant = document.getElementById('fav-tab-want');
+    const btnLiked  = document.getElementById('fav-tab-liked');
+    const btnFollow = document.getElementById('fav-tab-follow');
+    const panelFeed = document.getElementById('fav-panel-feed');
+    const panelWant = document.getElementById('fav-panel-want');
+    const panelLiked  = document.getElementById('fav-panel-liked');
+    const panelFollow = document.getElementById('fav-panel-follow');
+
+    if(!btnFeed || !btnWant || !btnLiked || !btnFollow || !panelFeed || !panelWant || !panelLiked || !panelFollow) return;
+
+    const mode = state.favMode || 'liked';
+
+    // activate tabs
+    btnFeed.classList.toggle('active', mode==='feed');
+    btnWant.classList.toggle('active', mode==='want');
+    btnLiked.classList.toggle('active', mode==='liked');
+    btnFollow.classList.toggle('active', mode==='follow');
+
+    // panels
+    panelFeed.classList.toggle('hidden', mode!=='feed');
+    panelWant.classList.toggle('hidden', mode!=='want');
+    panelLiked.classList.toggle('hidden', mode!=='liked');
+    panelFollow.classList.toggle('hidden', mode!=='follow');
+
+    if(mode==='feed'){
+      renderFollowFeed();
+    }else if(mode==='want'){
+      renderWantedPosts();
+    }else if(mode==='liked'){
+      renderLikedPosts();
+    }
+  }
+
+
+
+  function renderFollowFeed(){
+    ensureSeededPosts();
+    const wrap = document.getElementById('fav-feed-timeline');
+    const empty = document.getElementById('fav-feed-empty');
+    if(!wrap || !empty) return;
+
+    let posts = [...state.posts];
+
+    // Apply safety filters (same as timeline)
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>{
+        const key = normalizeFollowKey(p.author?.name || '');
+        return !state.mutedAuthors.has(key);
+      });
+    }
+
+    // Follow feed: official always + followed authors
+    posts = posts.filter(p=>{
+      const key = normalizeFollowKey(p.author?.name || '');
+      return (p.author?.type==='official') || state.follows.has(key);
+    });
+
+    // If you follow nobody, show only official posts + empty guidance
+    if(state.follows.size===0){
+      posts = posts.filter(p=>p.author?.type==='official');
+      empty.classList.remove('hidden');
+    }else{
+      empty.classList.add('hidden');
+    }
+
+    wrap.innerHTML = posts.map(p=>renderPostCard(p)).join('') + `<div class="h-6"></div>`;
+    bindPostOpeners();
+    bindGuards();
+  }
+
+function renderLikedPosts(){
+    ensureSeededPosts();
+    const wrap = document.getElementById('liked-posts');
+    const empty = document.getElementById('liked-empty');
+    if(!wrap || !empty) return;
+
+    let posts = state.posts.filter(p=>!!p.userLiked);
+
+    // Apply same safety filters as timeline
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>{
+        const key = normalizeFollowKey(p.author?.name || '');
+        return !state.mutedAuthors.has(key);
+      });
+    }
+
+
+  function renderWantedPosts(){
+    ensureSeededPosts();
+    const wrap = document.getElementById('fav-want-timeline');
+    const empty = document.getElementById('fav-want-empty');
+    if(!wrap || !empty) return;
+
+    const wants = state.wants || new Set();
+    let posts = [...state.posts].filter(p=>wants.has(p.id));
+
+    // Apply safety filters
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>!state.mutedAuthors.has(p.author.id));
+    }
+
+    if(!posts.length){
+      wrap.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    posts.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    wrap.innerHTML = posts.map(renderPostCard).join('');
+    bindOpenPostHandlers(wrap);
+  }
+
+    if(posts.length === 0){
+      wrap.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Expressive clean list (no cards)
+    const rows = posts.map(p=>renderLikedRow(p)).join('');
+    wrap.innerHTML = rows;
+    bindGuards();
+  }
+
+  function renderLikedRow(p){
+    const author = p.author || {};
+    const name = author.name || 'ユーザー';
+    const icon = author.icon || 'person';
+    const date = formatPostTime(p);
+    const txt = String(p.public_text || p.text || '').replace(/\\n+/g,' ');
+    const likeIcon = p.userLiked ? 'favorite' : 'favorite_border';
+    const likeCount = (p.stats && typeof p.stats.like==='number') ? p.stats.like : 0;
+    const cCount = (p.stats && typeof p.stats.comment==='number') ? p.stats.comment : 0;
+
+    const avatar = (author.type==='official')
+      ? `<div class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-[var(--brand)] rounded-full"><span class="ms">${icon}</span></div>`
+      : (author.type==='shop')
+        ? `<div class="w-10 h-10 bg-gray-100 flex items-center justify-center text-gray-700 rounded-full"><span class="ms">${icon}</span></div>`
+        : (author.type==='ops')
+          ? `<div class="w-10 h-10 bg-gray-900 text-white flex items-center justify-center rounded-full"><span class="ms">${icon}</span></div>`
+          : `<div class="w-10 h-10 bg-gray-200 flex items-center justify-center text-gray-700 rounded-full"><span class="ms">${icon}</span></div>`;
+
+    const badge = (p.kind==='official')
+      ? `<span class="badge badge-official">OFFICIAL</span>`
+      : (p.kind==='shop')
+        ? `<span class="badge badge-shop">SHOP</span>`
+        : (p.kind==='petition')
+          ? `<span class="badge badge-petition">注意</span>`
+          : (p.kind==='repair')
+            ? `<span class="badge badge-repair">今夜レポ</span>`
+            : (p.kind==='debate')
+              ? `<span class="badge badge-debate">議論</span>`
+              : '';
+
+    return `
+      <div class="px-4 py-3 flex items-start gap-3 border-b border-gray-100 tap" onclick="openPost('${p.id}')">
+        ${avatar}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <div class="font-black text-sm truncate">${name}</div>
+            <div class="text-xs text-gray-400">${date}</div>
+            ${badge}
+          </div>
+          <div class="text-sm text-gray-800 leading-snug mt-1 clamp2">${txt}</div>
+          <div class="mt-2 flex items-center gap-4 text-xs text-gray-400">
+            <span class="inline-flex items-center gap-1"><span class="ms fill" style="font-size:18px">${likeIcon}</span>${likeCount}</span>
+            <span class="inline-flex items-center gap-1"><span class="ms" style="font-size:18px">chat_bubble</span>${cCount}</span>
+          </div>
+        </div>
+        <button class="tap text-gray-400" data-action="requires-verify" onclick="event.stopPropagation(); likePost('${p.id}')">
+          <span class="ms fill">${likeIcon}</span>
+        </button>
+      </div>
+    `;
+  }
+
+
+
+// ---------- Settings (v13.4.1) ----------
+  const OPTIONAL_ATTR_CANDIDATES = [
+    {id:'tachinomi', label:'立ち飲み派', icon:'local_bar'},
+    {id:'senbero',   label:'せんべろ',   icon:'payments'},
+    {id:'smoke',     label:'喫煙可',     icon:'smoking_rooms'},
+    {id:'nosmoke',   label:'禁煙',       icon:'smoke_free'},
+    {id:'quiet',     label:'静かめ',     icon:'volume_off'},
+    {id:'karaoke',   label:'カラオケ',   icon:'mic'},
+    {id:'ramen',     label:'〆ラーメン', icon:'ramen_dining'},
+    {id:'late',      label:'終電まで',   icon:'schedule'}
+  ];
+
+  function toggleAccountSettings(shouldOpen=true){
+    // v14.0.2+: 設定はアカウント内に統合し、常時表示（アコーディオン無し）
+    // ここは「設定へジャンプ」用途だけ残す
+    state.activeTab = 'account';
+    nav('account');
+    updateTabbars();
+    renderAccount();
+
+    if(shouldOpen){
+      const panel = document.getElementById('account-settings-panel');
+      panel?.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }
+
+  function openSettings(){
+    // 互換API：設定ボタンから呼ばれても壊れないよう残す
+    toggleAccountSettings(true);
+  }
+
+  function renderSettings(){
+    const nickEl = document.getElementById('settings-nickname');
+    const saveBtn = document.getElementById('settings-nickname-save');
+    const hint = document.getElementById('settings-nickname-hint');
+    const showOpt = document.getElementById('settings-show-optional');
+    const grid = document.getElementById('settings-optional-grid');
+    const countEl = document.getElementById('settings-optional-count');
+
+    if(nickEl) nickEl.value = state.nickname || '';
+
+    // monthly nickname change rule (30 days)
+    const now = Date.now();
+    const last = Number(state.profile?.lastNicknameChange || 0);
+    const diffDays = last ? Math.floor((now - last) / (1000*60*60*24)) : 999;
+    const canChange = diffDays >= 30;
+
+    if(saveBtn){
+      saveBtn.disabled = !canChange;
+    }
+    if(hint){
+      hint.textContent = canChange
+        ? 'いつでも変更できます（次回の変更は保存後に30日経過してから）'
+        : `次の変更まであと ${30 - diffDays} 日`;
+    }
+
+    if(showOpt){
+      showOpt.checked = !!state.profile?.showOptionalAttrs;
+    }
+
+    const selected = new Set(state.profile?.optionalAttrs || []);
+    if(countEl) countEl.textContent = String(selected.size);
+
+    if(grid){
+      grid.innerHTML = OPTIONAL_ATTR_CANDIDATES.map(x=>{
+        const on = selected.has(x.label);
+        return `<button class="chip ${on?'chip--teal':'chip--outline'}" onclick="toggleOptionalAttr('${escapeHtml(x.label)}')">
+          <span class="ms">${x.icon}</span>${escapeHtml(x.label)}
+        </button>`;
+      }).join('');
+    }
+  }
+
+  function toggleOptionalAttrs(){
+    state.profile.showOptionalAttrs = !!document.getElementById('settings-show-optional')?.checked;
+    renderSettings();
+    // rerender current screen if needed
+    renderHome();
+  }
+
+  function toggleOptionalAttr(label){
+    const set = new Set(state.profile.optionalAttrs || []);
+    if(set.has(label)){
+      set.delete(label);
+    }else{
+      if(set.size >= 3){
+        toast('任意チップは最大3つまで');
+        return;
+      }
+      set.add(label);
+    }
+    state.profile.optionalAttrs = Array.from(set);
+    renderSettings();
+    renderHome();
+  }
+
+  function saveNickname(){
+    const input = document.getElementById('settings-nickname');
+    const val = (input?.value || '').trim();
+    if(!val){
+      toast('ニックネームを入力してください');
+      return;
+    }
+
+    const now = Date.now();
+    const last = Number(state.profile?.lastNicknameChange || 0);
+    const diffDays = last ? Math.floor((now - last) / (1000*60*60*24)) : 999;
+    if(diffDays < 30){
+      toast('ニックネームは月1回まで変更できます');
+      renderSettings();
+      return;
+    }
+
+    state.nickname = val;
+    state.profile.lastNicknameChange = now;
+    toast('ニックネームを更新しました（Mock）');
+    renderSettings();
+    renderHome();
+  }
+
+  function logout(){
+    // keep optional prefs but reset auth + persona
+    state.status = 'guest';
+    state.persona = 'personal';
+    state.activeTab = 'home';
+    toast('ログアウトしました（Mock）');
+    nav('guest');
+  }
+
+  function deleteAccount(){
+    if(!confirm('退会しますか？（モック：状態とデータを初期化します）')) return;
+
+    state.status = 'guest';
+    state.nickname = 'ヒロシ';
+    state.persona = 'personal';
+    state.shops = [];
+    state.follows = new Set();
+    state.posts = [];
+    state.profile.optionalAttrs = [];
+    state.profile.showOptionalAttrs = true;
+    state.profile.lastNicknameChange = 0;
+
+    toast('退会しました（Mock）');
+    nav('guest');
+  }
+
+  // ---------- Splash (v13 safe) ----------
+  function startSplash(){
+    const run = () => {
+      // 多重実行防止（v14+で不安定化しがちなポイントを先に潰す）
+      if (window.__splashTimerId) return;
+
+      window.__splashTimerId = window.setTimeout(() => {
+        try {
+          nav('guest');
+        } catch (e) {
+          console.error('[Splash] nav failed:', e);
+        } finally {
+          window.__splashTimerId = null;
+        }
+      }, 1200);
+    };
+
+    // 重要：DOMContentLoaded後にスクリプトが評価される場合でも確実に動くようにする
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  }
+
+
+  // ---------- Signup flow ----------
+  function checkStep1(){
+    const val = document.getElementById('input-nick').value.trim();
+    const btn = document.getElementById('btn-step1');
+    const icon = document.getElementById('icon-preview');
+    if(val.length>0){
+      btn.disabled=false;
+      btn.classList.remove('opacity-50','cursor-not-allowed');
+      state.nickname = val;
+      state.avatarSeed = Math.max(1, Math.min(9, val.length));
+      icon.innerHTML = makeAvatarSVG(state.avatarSeed);
+    }else{
+      btn.disabled=true;
+      btn.classList.add('opacity-50','cursor-not-allowed');
+      icon.innerHTML = '<span class="ms" style="font-size:40px">person</span>';
+    }
+  }
+  function simulateBadgeGen(){
+    const area = document.getElementById('input-area').value;
+    const birth = document.getElementById('input-birth').value;
+    const container = document.getElementById('badge-container');
+    const btn = document.getElementById('btn-step2');
+
+    const badges = [];
+    if(area.match(/新橋|汐留|内幸町|虎ノ門/)){
+      badges.push(tag('🚉 新橋エリア'));
+      badges.push(tag('🏙️ 都心'));
+    }
+    if(birth){
+      const y = new Date(birth).getFullYear();
+      if(y<=1989) badges.push(tag('🧑‍💼 30-40代'));
+      else if(y<=1999) badges.push(tag('🧑‍💻 ミレニアル'));
+      else badges.push(tag('📱 Z世代'));
+    }
+
+    container.innerHTML = badges.length ? badges.join('') : '<span class="text-xs text-gray-400">入力内容から分析中…</span>';
+
+    if(area.replace(/\\D/g,'').length>=7 && birth){
+      btn.disabled=false;
+      btn.classList.remove('opacity-50','cursor-not-allowed');
+    }
+  }
+  function tag(txt){
+    return `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-black mr-1">${txt}</span>`;
+  }
+  function checkStep3(){
+    const ok = document.getElementById('check-terms').checked;
+    const btn = document.getElementById('btn-step3');
+    if(ok){
+      btn.disabled=false;
+      btn.classList.remove('opacity-50','cursor-not-allowed');
+    }else{
+      btn.disabled=true;
+      btn.classList.add('opacity-50','cursor-not-allowed');
+    }
+  }
+  function finishSignup(){
+    state.status = 'verified';
+    state.persona = 'personal';
+    ensureSeededPosts();
+    syncHeaderAvatar();
+    renderHomeBanner();
+    renderTimeline();
+    goTab('home');
+  }
+  function quickLogin(){
+    // mock: SMSログイン済み
+    state.status = 'verified';
+    ensureSeededPosts();
+    syncHeaderAvatar();
+    renderHomeBanner();
+    renderTimeline();
+    goTab('home');
+  }
+
+  // ---------- Home stream ----------
+  function setHomeStream(v){
+    state.homeStream = v;
+    const a = document.getElementById('home-tab-town');
+    const b = document.getElementById('home-tab-follow');
+    if(!a || !b){ renderTimeline(); return; }
+    if(v==='town'){
+      a.className='flex-1 py-3 text-[var(--brand)] border-b-2 border-[var(--brand)]';
+      b.className='flex-1 py-3 text-gray-400';
+    }else{
+      a.className='flex-1 py-3 text-gray-400';
+      b.className='flex-1 py-3 text-[var(--brand)] border-b-2 border-[var(--brand)]';
+    }
+    renderTimeline();
+  }
+
+  // ---------- Guard: actions require verified ----------
+  function isVerified(){ return state.status==='verified'; }
+  function guardAction(){
+    if(!isVerified()){
+      openModal('auth-modal');
+      return false;
+    }
+    return true;
+  }
+  function bindGuards(){
+    document.querySelectorAll('[data-action="requires-verify"]').forEach(el=>{
+      if(el.__guardBound) return;
+      el.__guardBound = true;
+      el.addEventListener('click', (e)=>{
+        // If the element has its own onclick handler, we still want to guard first.
+        if(!isVerified()){
+          e.preventDefault();
+          e.stopPropagation();
+          openModal('auth-modal');
+        }
+      }, true);
+    });
+  }
+
+  // ---------- SMS flow ----------
+  function openSMSFlow(){
+    closeModal('auth-modal');
+    openModal('sms-modal');
+    smsReset();
+  }
+  function smsReset(){
+    show('sms-step-1'); hide('sms-step-2');
+    const p = document.getElementById('sms-phone');
+    const c = document.getElementById('sms-code');
+    if(p) p.value='';
+    if(c) c.value='';
+  }
+  function smsSendCode(){
+    const phone = (document.getElementById('sms-phone')?.value || '').trim();
+    if(!phone){ toast('電話番号を入力してください'); return; }
+    hide('sms-step-1'); show('sms-step-2');
+    toast('コードを送信しました（Mock）');
+  }
+  function smsBack(){
+    show('sms-step-1'); hide('sms-step-2');
+  }
+  function smsVerifyCode(){
+    const code = (document.getElementById('sms-code')?.value || '').trim();
+    if(code !== '123456'){ toast('コードが違います（Mock）'); return; }
+    state.status = 'verified';
+    closeModal('sms-modal');
+    renderAccount();
+    renderHomeBanner();
+    toast('SMSログインが完了しました');
+    if(state._afterSmsAction){
+      const a = state._afterSmsAction; state._afterSmsAction = null;
+      if(a.type==='want' && a.postId){ toggleWantPost(a.postId); }
+      if(a.type==='createPlan'){ openCreatePlan(); }
+    }
+  }
+
+  // ---------- Account / Shop ----------
+  function setStatus(s){
+    state.status = s;
+    // If guest, send to guest screen; else stay
+    if(s==='guest'){
+      nav('guest');
+      state.activeTab='home';
+    }else{
+      ensureSeededPosts();
+      openAccount();
+    }
+    renderAccount();
+    renderHomeBanner();
+    renderTimeline();
+  }
+  function renderAccount(){
+    const label = document.getElementById('status-label');
+    const desc = document.getElementById('status-desc');
+    if(!label) return;
+
+    const map = {
+      guest: { t:'ゲスト', d:'タイムラインは一部のみ（登録で“全部見える”）' },
+      member: { t:'会員登録済み', d:'投稿は全部閲覧OK（アクションは不可）' },
+      verified: { t:'SMSログイン済み', d:'アクションが解放（治安と信頼）' }
+    };
+    label.textContent = map[state.status].t;
+    desc.textContent = map[state.status].d;
+
+    document.getElementById('personal-name').textContent = state.nickname || 'ヒロシ';
+    document.getElementById('whoami').textContent = prettyPersona();
+
+    // Shop list in account page
+    const list = document.getElementById('shop-list');
+    if(list){
+      list.innerHTML = state.shops.length ? state.shops.map(s=>shopRow(s,false)).join('') : '<div class="text-xs text-gray-400">まだありません</div>';
+      list.querySelectorAll('[data-switch]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const id = btn.getAttribute('data-switch');
+          switchPersona('shop:'+id);
+        });
+      });
+    }
+
+    // Switcher modal shop list
+    const sw = document.getElementById('switcher-shops');
+    if(sw){
+      sw.innerHTML = state.shops.length ? state.shops.map(s=>shopRow(s,true)).join('') : '<div class="text-xs text-gray-400 border border-gray-200 rounded-sm p-4">店舗アカウントがありません</div>';
+      sw.querySelectorAll('[data-switch]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.getAttribute('data-switch');
+          switchPersona('shop:'+id);
+        });
+      });
+    }
+
+    // active marker
+    const pa = document.getElementById('personal-active');
+    if(pa){
+      pa.textContent = (state.persona==='personal') ? 'ACTIVE' : '';
+    }
+
+    renderSettings();
+
+    bindGuards();
+  }
+  function shopRow(s, forSwitcher){
+    const active = (state.persona==='shop:'+s.id);
+    const right = forSwitcher ? `<div class="text-xs font-black ${active?'text-[var(--brand)]':'text-gray-500'}">${active?'ACTIVE':''}</div>` : `<button class="text-xs font-black px-3 py-2 border border-gray-200 rounded-sm" data-switch="${s.id}">切替</button>`;
+    return `
+      <div class="border border-gray-200 rounded-sm p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gray-900 text-white flex items-center justify-center rounded-sm"><span class="ms">storefront</span></div>
+          <div>
+            <div class="font-black text-sm">${escapeHtml(s.name)}</div>
+            <div class="text-xs text-gray-500">法人番号: ${maskCorp(s.corp)}</div>
+          </div>
+        </div>
+        ${right}
+      </div>
+    `;
+  }
+  function createShop(){
+    if(!guardAction()) return;
+    const corp = (document.getElementById('corp-number').value || '').replace(/\\D/g,'');
+    const name = (document.getElementById('shop-name').value || '').trim();
+    if(corp.length!==13){
+      toast('法人番号は13桁です');
+      return;
+    }
+    if(!name){
+      toast('店舗名を入力してください');
+      return;
+    }
+    const id = 's'+Date.now().toString(36);
+    state.shops.unshift({id, name, corp, invitedStaff:true});
+    document.getElementById('corp-number').value='';
+    document.getElementById('shop-name').value='';
+    renderAccount();
+    toast('店舗アカウントを追加しました');
+  }
+  function openSwitcher(){
+    renderAccount();
+    openModal('switcher-modal');
+  }
+  function switchPersona(p){
+    state.persona = p;
+    closeModal('switcher-modal');
+    syncHeaderAvatar();
+    // Update compose author and debug
+    renderAccount();
+    renderTimeline();
+    toast('アカウントを切り替えました');
+  }
+  function prettyPersona(){
+    if(state.persona==='personal') return `個人: ${state.nickname || 'ヒロシ'}`;
+    const id = state.persona.split(':')[1];
+    const s = state.shops.find(x=>x.id===id);
+    return s ? `店舗: ${s.name}` : '店舗: 不明';
+  }
+  function maskCorp(c){
+    if(!c || c.length<13) return c || '—';
+    return c.slice(0,4)+'••••••'+c.slice(-3);
+  }
+
+  // ---------- Timeline data ----------
+  function ensureSeededPosts(){
+    if(state.posts.length) return;
+    state.posts = seedPosts();
+  }
+
+  function ensureSeededNotifications(){
+    if(state.notifications && state.notifications.length) return;
+    state.notifications = seedNotifications();
+    updateNotifBadges();
+  }
+  function seedNotifications(){
+    const now = Date.now();
+    return [
+      { id:'n1', time:'8分前', icon:'local_fire_department', title:'今夜の新橋：混雑＆キャッチ注意', body:'ホットスポットが更新されました（無理な呼び込みはスルー推奨）。', read:false, ts: now-8*60*1000},
+      { id:'n2', time:'25分前', icon:'storefront', title:'立呑み「銀の樽」が新しい投稿をしました', body:'ハッピーアワー（〜19:00）が始まりました。', read:false, ts: now-25*60*1000},
+      { id:'n3', time:'55分前', icon:'chat_bubble', title:'あなたの投稿に返信がきました', body:'「終電前の0次会」についてコメントが追加されました。', read:false, ts: now-55*60*1000},
+    ];
+  }
+  function seedPosts(){
+    const now = Date.now();
+    return [
+      {
+        id:'post-1',
+        kind:'trend',
+        author:{type:'ops', name:'SocioVoice 新橋', badge:'OPS', icon:'auto_awesome'},
+        meta:{ts:now - 6*60*1000, time:'6分前', tag:'今夜', tagIcon:'local_fire_department', tagTone:'amber'},
+        title:'今夜の新橋：混雑＆キャッチ注意マップ（目安）',
+        textPublic:'混雑しやすい通りと、声かけが多いエリアの目安です。\n無理な呼び込みはスルーでOK。トラブルは無理せず離脱。',
+        actions:{ seen:true }
+      },
+      {
+        id:'post-2',
+        kind:'shop',
+        author:{type:'shop', name:'立呑み「銀の樽」', badge:'SHOP', icon:'local_bar', place:'新橋駅西口', now:true},
+        meta:{ts:now - 14*60*1000, time:'14分前', tag:'空席', tagTone:'teal', tagIcon:'event_seat'},
+        planId:'today',
+        planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
+        text:'【〜19:00】ハッピーアワーやってます。サク飲み歓迎🍺',
+        media:[{type:'image', label:'Happy Hour', ratio:'video'}],
+        stats:{like:23, comment:3}
+      },
+      {
+        id:'post-3',
+        kind:'user',
+        author:{type:'user', name: state.nickname || 'ヒロシ', badges:['はしご派','0次会'], icon:'person'},
+        meta:{ts:now - 28*60*1000, time:'28分前'},
+        planId:'today',
+        planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
+        textPublic:'終電前の0次会って、みんなどこから入る？\n「一杯だけ・静かめ」だと西口側がラクだった。',
+        stats:{like:41, comment:9}
+      },
+      {
+        id:'post-4',
+        kind:'shop',
+        author:{type:'shop', name:'串焼き しんばし太郎', badge:'SHOP', icon:'restaurant', place:'烏森口'},
+        meta:{ts:now - 52*60*1000, time:'52分前', tag:'おすすめ', tagTone:'teal', tagIcon:'thumb_up'},
+        text:'本日、串5本セットが少しお得です。1軒目にも2軒目にもどうぞ。',
+        media:[{type:'image', label:'Yakitori Set', ratio:'video'}],
+        ticket:{ title:'串5本セット 50円引き', note:'※19:00まで', remain:'残り 28枚' },
+        stats:{like:19, comment:2}
+      },
+      {
+        id:'post-5',
+        kind:'discussion',
+        author:{type:'user', name:'ユウコ', badges:['常連'], icon:'person'},
+        meta:{ts:now - 95*60*1000, time:'1時間半前'},
+        title:'喫煙OK/NG、みんなはどっち派？',
+        textPublic:'新橋だと店によって結構違うよね。\n「会話したい派」にはどのタイプが楽？',
+        pills:[{label:'喫煙OKが助かる', n:18},{label:'禁煙の方がいい', n:26},{label:'どっちでも', n:9}]
+      },
+      {
+        id:'post-6',
+        kind:'trend',
+        author:{type:'system', name:'SYSTEM', badge:'TREND', icon:'whatshot'},
+        meta:{ts:now - 2*60*60*1000, time:'2時間前'},
+        title:'🔥 いま注目：終電前の“サク飲み”導線',
+        textPublic:'「一杯だけ」「静かめ」「早め撤収」派の投稿が集まっています。',
+        stats:{like:72, comment:21}
+      },
+      {
+        id:'post-7',
+        kind:'shop',
+        author:{type:'shop', name:'餃子スタンド 88', badge:'SHOP', icon:'ramen_dining', place:'SL広場側', now:true},
+        meta:{ts:now - 3*60*60*1000, time:'3時間前'},
+        text:'【本日】餃子＋ハイボールのセットあります。0次会にも〆にも。',
+        media:[{type:'image', label:'Gyoza & Highball', ratio:'video'}],
+        stats:{like:34, comment:4}
+      },
+      {
+        id:'post-8',
+        kind:'debate',
+        author:{type:'user', name:'カズ', badges:['新橋勤務'], icon:'person'},
+        meta:{ts:now - 5*60*60*1000, time:'5時間前', flag:'AI整形', flagIcon:'auto_fix_high', flagTone:'purple'},
+        title:'「呼び込み」って断り方の正解ある？',
+        textPublic:'声かけが多い時、角が立たない断り方を知りたい。\n（※言い回しを整えて表示）',
+        textOriginal:'呼び込みうざい。断ってもついてくる時どうすりゃいいの？',
+        actions:{reacts:[{k:'🤔 懸念あり', n:15, needVerify:true},{k:'💡 アイデア', n:12, needVerify:true}]},
+        stats:{like:58, comment:17}
+      },
+      {
+        id:'post-9',
+        kind:'shop',
+        author:{type:'shop', name:'立ち食い そば丸（新橋）', badge:'SHOP', icon:'restaurant', place:'駅前', now:false},
+        meta:{ts:now - 7*60*60*1000, time:'7時間前', tag:'〆', tagTone:'slate', tagIcon:'nightlight'},
+        text:'〆にどうぞ。今夜は天ぷらが揚がってます。',
+        stats:{like:12, comment:0}
+      }
+    ];
+  }
+
+  function renderHomeBanner(){
+    const el = document.getElementById('home-banner');
+    if(!el) return;
+    // タイムライン上のUI説明は省略（要望により）。
+    el.innerHTML = '';
+    el.classList.add('hidden');
+}
+
+function renderTimeline(){
+    ensureSeededPosts();
+    const tl = document.getElementById('timeline');
+    if(!tl) return;
+
+    let posts = [...state.posts];
+
+    // Filter: reported posts (hidden)
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+
+    // Filter: muted authors (hidden)
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>{
+        const key = normalizeFollowKey(p.author?.name || '');
+        return !state.mutedAuthors.has(key);
+      });
+    }
+
+    // Follow stream: show only followed + official (as baseline) for mock
+    if(state.homeStream==='follow'){
+      posts = posts.filter(p=>{
+        if(p.author.type==='official') return true;
+        const key = normalizeFollowKey(p.author.name);
+        return state.follows.has(key);
+      });
+    }
+
+    // HOT SHINBASHI picks should be computed before guest slicing
+    const hotPicks = (state.status==='guest') ? [] : getHotShinbashiPicks(posts);
+
+    // In guest mode (preview), user should be on guest screen; still keep safe:
+    if(state.status==='guest'){
+      posts = posts.slice(0,2);
+    }
+
+    // Build timeline with an inserted "HOT SHINBASHI" module after 2 posts (recommended)
+    const parts = [];
+    posts.forEach((p, idx)=>{
+      parts.push(renderPostCard(p));
+      if(idx===1 && hotPicks.length){
+        parts.push(renderHotShinbashiModule(hotPicks));
+      }
+    });
+
+    // If there were <2 posts but we still have picks, append at end
+    if(posts.length<2 && hotPicks.length){
+      parts.push(renderHotShinbashiModule(hotPicks));
+    }
+
+    tl.innerHTML = parts.join('') + `<div class="h-6"></div>`;
+    bindPostOpeners();
+    bindGuards();
+  }
+
+  // HOT SHINBASHI: rule-based picks (MVP)
+  function getHotShinbashiPicks(posts){
+    const kws = ['新橋','烏森','SL','ガード下','立ち飲','立呑','ハイボール','串','餃子','終電','0次会','二次会','サク飲','西口','東口','汐留'];
+    const now = Date.now();
+    const DAY = 24*60*60*1000;
+
+    const scored = (posts||[])
+      .filter(p=>Array.isArray(p.media) && p.media.length && p.media[0].type==='image')
+      .filter(p=>{
+        const ts = p?.meta?.ts;
+        if(typeof ts==='number' && Number.isFinite(ts)){
+          return (now - ts) <= DAY;
+        }
+        return true; // if unknown, keep in MVP
+      })
+      .map(p=>{
+        const hay = `${p.title||''}\n${getPublicText(p)||''}\n${(p.text||'')}\n${(p.author?.name||'')}`.toLowerCase();
+        const kwHit = kws.reduce((acc, w)=>{
+          return acc + (hay.includes(String(w).toLowerCase()) ? 1 : 0);
+        }, 0);
+
+        const like = Number(p?.stats?.like||0);
+        const comment = Number(p?.stats?.comment||0);
+        const wantBoost = (state.wants && state.wants.has(p.id)) ? 6 : 0;
+
+        // Prefer user posts slightly over shop posts for "SNSっぽさ"
+        const typeBoost = p.author?.type==='user' ? 6 : (p.author?.type==='shop' ? 2 : 0);
+
+        // Freshness boost (smaller is better)
+        const ts = Number(p?.meta?.ts||now);
+        const minutesAgo = Math.max(0, Math.round((now - ts)/60000));
+        const freshBoost = Math.max(0, 25 - Math.min(25, Math.floor(minutesAgo/10))); // up to +25
+
+        const score = kwHit*6 + like + comment*2 + wantBoost + typeBoost + freshBoost;
+        return {p, score};
+      })
+      .sort((a,b)=>b.score-a.score);
+
+    // De-dup by author (max 2) to avoid "店宣伝" domination
+    const byAuthor = new Map();
+    const picks = [];
+    for(const it of scored){
+      const k = normalizeFollowKey(it.p.author?.name || 'unknown');
+      const n = byAuthor.get(k) || 0;
+      if(n>=2) continue;
+      byAuthor.set(k, n+1);
+      picks.push(it.p);
+      if(picks.length>=6) break;
+    }
+    return picks;
+  }
+
+  function renderHotShinbashiModule(picks){
+    const cards = (picks||[]).map(p=>{
+      const m = (p.media||[])[0];
+      const img = m ? `<div class="img-placeholder w-full aspect-video rounded-sm">[Image: ${escapeHtml(m.label||'Photo')}]</div>` : '';
+      const dt = formatPostTime(p);
+      const name = escapeHtml(p.author?.name || '');
+      const meta = `<div class="mt-2 text-[11px] text-gray-500 flex items-center justify-between gap-2">
+          <span class="truncate">${name}</span>
+          <span class="shrink-0">${dt}</span>
+        </div>`;
+      return `<div class="hot-card tap" role="button" tabindex="0" data-open="${p.id}">
+        ${img}
+        ${meta}
+      </div>`;
+    }).join('');
+
+    return `
+      <section class="bg-white border-b border-gray-100 px-4 py-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="ms text-[18px] text-[var(--brand)]">local_fire_department</span>
+            <div class="min-w-0">
+              <div class="text-sm font-black tracking-wide truncate">HOT SHINBASHI</div>
+              <div class="text-[11px] text-gray-500">直近24hの写真投稿からピックアップ</div>
+            </div>
+          </div>
+          <button class="tap px-2 py-2 rounded-full" onclick="toast('特集の条件（Mock）')" aria-label="詳細">
+            <span class="ms text-[18px] text-gray-400">info</span>
+          </button>
+        </div>
+        <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+          ${cards || `<div class="text-xs text-gray-400">まだ写真投稿がありません</div>`}
+        </div>
+      </section>
+    `;
+  }
+
+  function normalizeFollowKey(name){
+    const map = {
+      'SocioVoice 新橋':'ops_shinbashi',
+      '立呑み「銀の樽」':'bar_ginnotaru',
+      '串焼き しんばし太郎':'kushiyaki_taro',
+      '餃子スタンド 88':'gyoza_88',
+      '立ち食い そば丸（新橋）':'sobamaru_shinbashi'
+    };
+    return map[name] || name;
+  }
+
+    function getPublicText(p){
+        // 公開される本文：AI整形済みがあればそれを優先
+        return (p && typeof p.textPublic === 'string' && p.textPublic.trim().length) ? p.textPublic : (p.text || '');
+    }
+
+
+  function formatPostTime(p){
+    try{
+      const ts = p?.meta?.ts;
+      const d = (typeof ts === 'number' && Number.isFinite(ts)) ? new Date(ts) : null;
+      if(d){
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        return `${yyyy}/${mm}/${dd}/`;
+      }
+    }catch(e){}
+    // fallback
+    const raw = p?.meta?.time || '';
+    return raw ? String(raw) : '';
+  }
+
+
+    function hasOriginalText(p){
+        if(!p || typeof p.textOriginal !== 'string') return false;
+        const o = p.textOriginal.trim();
+        const pub = getPublicText(p).trim();
+        return o.length > 0 && o !== pub;
+    }
+
+
+
+  function renderPostCard(p){
+    const commonHeader = renderPostHeader(p);
+    const body = renderPostBody(p);
+    const kindClass = (p.kind==='official') ? 'post-official'
+      : (p.kind==='progress' ? 'post-progress'
+      : (p.kind==='trend' ? 'post-trend' : ''));
+    const bgClass = (p.kind==='official' || p.kind==='progress' || p.kind==='trend') ? '' : 'bg-white';
+    return `<article class="${kindClass} p-4 border-b border-gray-100 ${bgClass} tap" data-open="${p.id}">${commonHeader}${body}</article>`;
+  }
+
+  function renderPostHeader(p){
+    const icon = p.author.icon || 'person';
+
+    const iconBox = p.author.type==='official'
+      ? `<div class="w-11 h-11 bg-white border border-gray-200 flex items-center justify-center text-[var(--brand)] rounded-full"><span class="ms">${icon}</span></div>`
+      : (p.author.type==='ops'
+        ? `<div class="w-11 h-11 bg-gray-900 text-white flex items-center justify-center rounded-full"><span class="ms">${icon||'auto_awesome'}</span></div>`
+        : (p.author.type==='shop'
+          ? `<div class="w-11 h-11 bg-gray-100 flex items-center justify-center text-gray-700 rounded-full"><span class="ms">${icon}</span></div>`
+          : `<div class="w-11 h-11 bg-gray-200 rounded-full flex items-center justify-center text-gray-600"><span class="ms">person</span></div>`
+        )
+      );
+
+    const dt = formatPostTime(p);
+    const wanted = state.wants && state.wants.has(p.id);
+    const wantIcon = wanted ? 'star' : 'star_border';
+
+    return `
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <div class="flex items-center gap-3 min-w-0">
+          ${iconBox}
+          <div class="min-w-0">
+            <div class="name-row flex items-center gap-2 min-w-0">
+              <span class="font-black text-[15px] text-gray-900 truncate max-w-[16.5rem]">${escapeHtml(p.author.name)}</span>
+              ${dt ? `<span class="text-[11px] text-gray-500 font-bold shrink-0">${escapeHtml(dt)}</span>` : ``}
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <button class="icon-only" aria-label="行きたい" onclick="event.stopPropagation(); toggleWantPost('${p.id}')">
+            <span class="ms">${wantIcon}</span>
+          </button>
+          <button class="icon-only" aria-label="投稿メニュー" onclick="openPostMenu('${p.id}'); event.stopPropagation();">
+            <span class="ms">more_horiz</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMetaChips(p){
+    const chips = [];
+
+    // Type chips
+    if(p.author.type==='official'){
+      chips.push(`<span class="chip chip--teal"><span class="ms">verified</span>${escapeHtml(p.author.badge||'OFFICIAL')}</span>`);
+    }
+    if(p.author.type==='ops'){
+      const label = p.author.badge || 'SYSTEM';
+      chips.push(`<span class="chip chip--slate"><span class="ms">auto_awesome</span>${escapeHtml(label)}</span>`);
+    }
+    if(p.author.type==='shop'){
+      chips.push(`<span class="chip chip--slate"><span class="ms">storefront</span>SHOP</span>`);
+    }
+    if(p.author.type==='user' && Array.isArray(p.author.badges)){
+      p.author.badges.forEach(b=>{
+        chips.push(`<span class="chip chip--outline">${escapeHtml(b)}</span>`);
+      });
+
+    // Optional user attributes (selected in Settings)
+    if(p.author.type==='user' && state.profile?.showOptionalAttrs){
+      (state.profile.optionalAttrs||[]).forEach(a=>{
+        chips.push(`<span class="chip chip--outline"><span class="ms">label</span>${escapeHtml(a)}</span>`);
+      });
+    }
+
+    }
+
+    // Plan
+    if(p.planId){
+      const label = p.planTitle || '企画';
+      chips.push(`<span class="chip chip--outline"><span class="ms">flag</span>${escapeHtml(label)}</span>`);
+    }
+
+    // Place / time
+    if(p.author.place){
+      chips.push(`<span class="chip chip--outline"><span class="ms">place</span>${escapeHtml(p.author.place)}</span>`);
+    }
+
+    // Tag (icon-based)
+    if(p.meta?.tag){
+      const tone = p.meta.tagTone
+        || (p.kind==='official' ? 'teal' : (p.kind==='trend' ? 'amber' : (p.kind==='progress' ? 'slate' : 'slate')));
+      const iconName = p.meta.tagIcon
+        || (p.kind==='official' ? 'campaign' : (p.kind==='trend' ? 'local_fire_department' : (p.kind==='progress' ? 'insights' : 'label')));
+      chips.push(`<span class="chip chip--${tone}"><span class="ms">${iconName}</span>${escapeHtml(p.meta.tag)}</span>`);
+    }
+
+    // Flag (e.g., AI整形)
+    if(p.meta?.flag){
+      const tone = p.meta.flagTone || 'purple';
+      const iconName = p.meta.flagIcon || (p.meta.flag==='AI整形' ? 'auto_fix_high' : 'info');
+      chips.push(`<span class="chip chip--${tone}"><span class="ms">${iconName}</span>${escapeHtml(p.meta.flag)}</span>`);
+    }
+
+    // NOW (shop)
+    if(p.author.now){
+      chips.push(`<span class="chip chip--amber"><span class="ms">local_fire_department</span>NOW</span>`);
+    }
+
+    // Ratings (3-axis)
+    if(p.ratings){
+      const mapCost = {1:'安い',2:'ふつう',3:'高め'};
+      const mapTime = {1:'早い',2:'ふつう',3:'遅い'};
+      const mapVibe = {1:'静か',2:'ふつう',3:'賑やか'};
+      if(p.ratings.cost) chips.push(`<span class="chip chip--outline"><span class="ms">paid</span>コスパ:${escapeHtml(mapCost[p.ratings.cost]||'')}</span>`);
+      if(p.ratings.time) chips.push(`<span class="chip chip--outline"><span class="ms">schedule</span>タイパ:${escapeHtml(mapTime[p.ratings.time]||'')}</span>`);
+      if(p.ratings.vibe) chips.push(`<span class="chip chip--outline"><span class="ms">groups</span>雰囲気:${escapeHtml(mapVibe[p.ratings.vibe]||'')}</span>`);
+    }
+
+
+    // Machi-Report chip (街レポ)
+    if(p.kind==='report'){
+      const rc = getReportCategory(p.reportCategory);
+      chips.push(`<span class="chip chip--${rc.tone}"><span class="ms">${rc.icon}</span>街レポ・${escapeHtml(rc.label)}</span>`);
+    }
+
+    if(!chips.length) return '';
+    return `<div class="mt-3 mb-4 flex flex-wrap gap-2">${chips.join('')}</div>`;
+  }
+
+  function renderPostBody(p){
+    const pad = `pl-[3.25rem]`;
+    const title = p.title ? `<h3 class="font-black text-sm mb-1">${escapeHtml(p.title)}</h3>` : '';
+    const text = getPublicText(p) ? `<p class="text-sm text-gray-900 mb-3 leading-relaxed whitespace-pre-line">${escapeHtml(getPublicText(p))}</p>` : '';
+
+    const media = (p.media||[]).length ? renderMedia(p.media) : '';
+    const pinmap = p.pinMap ? `
+      <div class="mb-3">
+        <div class="text-[11px] text-gray-500 mb-2 flex items-center gap-2"><span class="ms" style="font-size:16px">location_on</span> ピン留めマップ</div>
+        <div class="img-placeholder w-full aspect-video rounded-sm">[Pinned Map]</div>
+      </div>` : '';
+
+    const actions = renderActions(p);
+
+    // Ticket block
+    const ticket = p.ticket ? `
+      <div class="ticket-dashed p-4 rounded-sm cursor-pointer hover:opacity-90 transition-opacity" data-action="requires-verify" onclick="toast('クーポン使用（Mock）')">
+        <div class="ticket-notch -left-2" style="border-right:1px dashed var(--brand)"></div>
+        <div class="ticket-notch -right-2" style="border-left:1px dashed var(--brand)"></div>
+        <div class="text-center">
+          <p class="text-[10px] font-black text-[var(--brand)] tracking-widest mb-1">WEEKEND COUPON</p>
+          <p class="text-xl font-black text-gray-800 mb-1">${escapeHtml(p.ticket.title)}</p>
+          <p class="text-xs text-gray-500 mb-3">${escapeHtml(p.ticket.note||'')}</p>
+          <div class="inline-block border-b border-[var(--brand)] text-[var(--brand)] text-xs font-black pb-0.5">クーポンを使う ></div>
+        </div>
+      </div>
+      <p class="text-[10px] text-gray-400 mt-2 text-right">${escapeHtml(p.ticket.remain||'')}</p>
+    ` : '';
+
+    const reportStatus = p.reportStatus ? `
+      <div class="bg-gray-50 p-2 text-xs text-gray-600 border border-gray-200 rounded-sm flex items-center gap-2">
+        <span class="ms" style="font-size:18px">${(p.kind==='report' ? getReportCategory(p.reportCategory).icon : 'build')}</span> ステータス: <span class="font-black">${escapeHtml(p.reportStatus)}</span>
+      </div>
+    ` : '';
+
+    const metaChips = renderMetaChips(p);
+    const pills = (p.pills||[]).length ? `
+      <div class="mt-4 mb-5 flex flex-wrap gap-2">
+        ${p.pills.map(x=>{
+          const label = x.label || '';
+          const iconName = x.icon || (label.includes('懸念') ? 'report_problem' : (label.includes('アイデア') ? 'lightbulb' : (label.includes('賛同') ? 'how_to_vote' : 'label')));
+          return `<button class="chip chip--outline" data-action="requires-verify" onclick="toast('${escapeHtml(label)}（Mock）')">
+            <span class="ms">${iconName}</span>${escapeHtml(label)} <span class="text-slate-500 font-black">(${x.n})</span>
+          </button>`;
+        }).join('')}
+      </div>
+    ` : '';
+
+    const petition = p.petition ? renderPetition(p.petition) : '';
+
+    return `
+      <div class="${pad}">
+        ${title}
+        ${text}
+        ${media}
+        ${pinmap}
+        ${ticket}
+        ${reportStatus}
+        ${metaChips}
+        ${pills}
+        ${petition}
+        ${actions}
+      </div>
+    `;
+  }
+
+  function renderMedia(arr){
+    if(!arr || !arr.length) return '';
+    const m = arr[0]; // limit: 1 image per post
+    const cls = m.ratio==='square' ? 'aspect-square' : (m.ratio==='video' ? 'aspect-video' : 'h-32');
+    return `<div class="img-placeholder w-full ${cls} mb-3 rounded-sm">[Image: ${escapeHtml(m.label)}]</div>`;
+  }
+
+  function renderPetition(pet){
+    const pct = Math.max(0, Math.min(100, Math.round((pet.current/pet.goal)*100)));
+    return `
+      <div class="bg-gray-50 p-4 border border-gray-200 rounded-sm mb-2">
+        <div class="flex justify-between text-[10px] font-black text-gray-500 mb-1">
+          <span>賛同者: ${pet.current.toLocaleString()}</span>
+          <span>目標: ${pet.goal.toLocaleString()}</span>
+        </div>
+        <div class="w-full h-2 bg-gray-200 mb-3 rounded-full overflow-hidden">
+          <div class="h-full bg-[var(--brand)]" style="width:${pct}%"></div>
+        </div>
+        <button class="w-full bg-[var(--brand)] text-white text-xs font-black py-3 rounded-sm hover:opacity-90" data-action="requires-verify" onclick="toast('同意（Mock）')">
+          <span class="ms" style="font-size:18px">handshake</span> 同意する
+        </button>
+      </div>
+      <p class="text-[10px] text-gray-400 text-center">※同意にはSMSログインが必要です</p>
+    `;
+  }
+
+  function renderActions(p){
+    // Official: align with others (♡/comment/share) — no special "Seen"
+    if(p.kind==='official'){
+      const like = p.stats?.like ?? 0;
+      const comment = p.stats?.comment ?? 0;
+      return `<div class="actions-row flex gap-5 text-gray-400 text-sm">
+        <button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="likePost('${p.id}', this)">
+          <span class="ms">${p.userLiked ? 'favorite' : 'favorite_border'}</span> <span>${like}</span>
+        </button>
+        <button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="toast('コメント（Mock）')">
+          <span class="ms">chat_bubble</span> ${comment}
+        </button>
+        <button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="sharePostDirect('${p.id}')">
+          <span class="ms">share</span>
+        </button>
+      </div>`;
+    }
+
+
+    // Others: like/comment/share
+    const like = p.stats?.like ?? 0;
+    const comment = p.stats?.comment ?? 0;
+
+    const buttons = [];
+    buttons.push(`<button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="likePost('${p.id}', this)"><span class="ms">${p.userLiked ? 'favorite' : 'favorite_border'}</span> <span>${like}</span></button>`);
+    if(p.kind!=='shop' || comment>0){
+      buttons.push(`<button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="toast('コメント（Mock）')"><span class="ms">chat_bubble</span> ${comment}</button>`);
+    }
+    buttons.push(`<button class="inline-flex items-center gap-1 text-gray-500 text-sm" data-action="requires-verify" onclick="toast('共有（Mock）')"><span class="ms">share</span></button>`);
+
+    return `<div class="actions-row flex gap-5">${buttons.join('')}</div>`;
+  }
+
+  // ---------- Post detail ----------
+  function bindPostOpeners(){
+    document.querySelectorAll('[data-open]').forEach(el=>{
+      if(el.__openBound) return;
+      el.__openBound = true;
+      el.addEventListener('click', (e)=>{
+        // Ignore clicks on buttons inside card
+        if(e.target.closest('button')) return;
+        const id = el.getAttribute('data-open');
+        openPost(id);
+      });
+    });
+  }
+  function openPost(id){
+    state.lastScreenBeforePost = state.activeTab==='home' ? 'home' : state.activeTab;
+    const p = state.posts.find(x=>x.id===id);
+    if(!p) return;
+    document.getElementById('post-detail').innerHTML = `
+      <div class="px-0">
+        ${renderPostCard(p).replace('tap','')}
+        ${hasOriginalText(p) ? `<div class="px-4 pt-3"><button class="text-[11px] font-black text-gray-500 underline decoration-dotted underline-offset-4" onclick="openOriginalForPost('${p.id}')">話題の元投稿を見る</button></div>` : ''}
+        <div class="px-4 pt-4">
+          <div class="border border-gray-200 rounded-sm p-4">
+            <div class="text-xs text-gray-500 mb-2">操作（最小限）</div>
+            <div class="grid grid-cols-2 gap-2">
+              <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" data-action="requires-verify" onclick="toast('コメントを書く（Mock）')">
+                <span class="ms" style="font-size:18px">edit_note</span> コメント
+              </button>
+              <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" data-action="requires-verify" onclick="toast('通報（Mock）')">
+                <span class="ms" style="font-size:18px">report</span> 通報
+              </button>
+            </div>
+            <div class="text-[11px] text-gray-500 mt-3 leading-relaxed">
+              ※投稿・アクションはSMSログイン後に解放。会員登録だけでも閲覧は可能。
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    nav('post');
+    bindGuards();
+  }
+  function backFromPost(){
+    // return to last tab screen
+    if(state.lastScreenBeforePost==='home') goTab('home');
+    else if(state.lastScreenBeforePost==='follow') goTab('follow');
+    else if(state.lastScreenBeforePost==='notif') goTab('notif');
+    else openAccount();
+  }
+
+  // ---------- Composer ----------
+  function openComposer(opts={}){
+    // Anyone can open the UI, but posting requires verified (guard on submit)
+    nav('compose');
+    document.getElementById('compose-author').textContent = prettyPersona();
+    document.getElementById('compose-text').value = '';
+    document.getElementById('compose-pinmap').checked = false;
+    state.compose.ratings = {cost:null,time:null,vibe:null};
+    updateComposeRatingsUI();
+    // Plan context (optional)
+    const defs = getPlanDefs?.() || {};
+    state.compose.planId = opts.planId || null;
+    state.compose.planTitle = opts.planTitle || (opts.planId ? (defs[opts.planId]?.title || null) : null);
+    updateComposePlanUI();
+    state.compose.type = 'normal';
+    updateComposeTypeUI();
+    updatePinMapPreview();
+    bindGuards();
+  }
+  
+  function clearComposePlan(){
+    state.compose.planId = null;
+    state.compose.planTitle = null;
+    updateComposePlanUI();
+    toast('企画を外しました');
+  }
+
+  function updateComposePlanUI(){
+    const box = document.getElementById('compose-planbox');
+    const name = document.getElementById('compose-planname');
+    const show = !!state.compose.planId;
+    if(box) box.classList.toggle('hidden', !show);
+    if(name) name.textContent = state.compose.planTitle || '企画';
+  }
+
+function closeComposer(){
+    goTab('home');
+  }
+  function setComposeType(t){
+    state.compose.type = t;
+    updateComposeTypeUI();
+  }
+  function updateComposeTypeUI(){
+    const ids = ['normal','report','petition'];
+    ids.forEach(x=>{
+      const el = document.getElementById('type-'+x);
+      if(!el) return;
+      const active = state.compose.type===x;
+      el.className = active
+        ? 'py-3 text-xs font-black border border-[var(--brand)] text-[var(--brand)] bg-teal-50 rounded-sm'
+        : 'py-3 text-xs font-black border border-gray-300 rounded-sm';
+    });
+  }
+  
+  function setComposeRating(axis, val){
+    if(!state.compose.ratings) state.compose.ratings = {cost:null,time:null,vibe:null};
+    const cur = state.compose.ratings[axis] ?? null;
+    state.compose.ratings[axis] = (cur===val) ? null : val;
+    updateComposeRatingsUI();
+  }
+
+  function updateComposeRatingsUI(){
+    const r = state.compose.ratings || {cost:null,time:null,vibe:null};
+    const axes = [
+      {axis:'cost', ids:['rate-cost-1','rate-cost-2','rate-cost-3']},
+      {axis:'time', ids:['rate-time-1','rate-time-2','rate-time-3']},
+      {axis:'vibe', ids:['rate-vibe-1','rate-vibe-2','rate-vibe-3']},
+    ];
+    axes.forEach(a=>{
+      const v = r[a.axis];
+      a.ids.forEach((id, idx)=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        const val = idx+1;
+        const active = v===val;
+        el.className = active
+          ? 'px-3 py-2 text-xs font-black bg-[var(--brand)] text-white'
+          : 'px-3 py-2 text-xs font-black bg-white text-gray-700 hover:bg-gray-50';
+        // keep divider borders if present in original markup
+        if(idx>0){
+          el.className += ' border-l border-gray-200';
+        }
+      });
+    });
+  }
+
+function updatePinMapPreview(){
+    const box = document.getElementById('pinmap-preview');
+    if(!box) return;
+    box.classList.toggle('hidden', !document.getElementById('compose-pinmap').checked);
+  }
+  document.addEventListener('change', (e)=>{
+    if(e.target && e.target.id==='compose-pinmap') updatePinMapPreview();
+  });
+
+  function submitPost(){
+    if(!guardAction()) return;
+
+    const text = (document.getElementById('compose-text').value || '').trim();
+    if(!text){
+      toast('本文を入力してください');
+      return;
+    }
+    const pin = document.getElementById('compose-pinmap').checked;
+    const ratings = state.compose.ratings || {cost:null,time:null,vibe:null};
+
+    const author = currentAuthor();
+    const newId = 'u'+Date.now().toString(36);
+
+    const p = {
+      id:newId,
+      kind: state.compose.type==='report' ? 'report' : (state.compose.type==='petition' ? 'petition' : (author.type==='shop'?'shop':'user')),
+      author,
+      meta:{ ts: Date.now(), time:'たった今', tag: state.compose.type==='petition' ? '⚠️ 注意 (同意)' : null },
+      title: state.compose.type==='petition' ? '（タイトル未設定）' : null,
+      text,
+      pinMap: pin,
+      ratings: (ratings.cost||ratings.time||ratings.vibe) ? ratings : null,
+      stats:{ like:0, comment:0 }
+    };
+
+    if(state.compose.planId){
+      p.planId = state.compose.planId;
+      p.planTitle = state.compose.planTitle || null;
+    }
+
+
+    if(state.compose.type==='petition'){
+      p.title = '新しい注意（Mock）';
+      p.petition = { current:0, goal:300 };
+    }
+    if(state.compose.type==='report'){
+      // default: broaden Machi-Report beyond repair only
+      p.reportCategory = state.compose.reportCategory || 'help';
+      // status is mainly for negative/issue categories
+      if(['repair','safety','environment'].includes(p.reportCategory)){
+        p.reportStatus = '担当課確認中';
+      }
+      p.media = [
+        {type:'image', label:'Report Photo', ratio:'square'}
+      ];
+    }
+
+    state.posts.unshift(p);
+    bumpRank(1);
+    toast('投稿しました');
+    goTab('home');
+    renderTimeline();
+  }
+
+  function currentAuthor(){
+    if(state.persona==='personal'){
+      return {type:'user', name: state.nickname || 'ヒロシ', badges:['会員'], icon:'person'};
+    }
+    const id = state.persona.split(':')[1];
+    const s = state.shops.find(x=>x.id===id);
+    return {type:'shop', name: s?.name || '店舗', badge:'SHOP', icon:'storefront', place:'—', now:false};
+  }
+
+
+
+  // ---------- Machi-Report (街レポ) category ----------
+  const REPORT_CATEGORIES = {
+    repair:      { label:'空席・混雑',     tone:'rose',  icon:'crowdsource' },
+    safety:      { label:'キャッチ注意',   tone:'rose',  icon:'report_problem' },
+    environment: { label:'喫煙・禁煙',     tone:'slate', icon:'smoke_free' },
+    help:        { label:'店選び相談',     tone:'slate', icon:'help' },
+    idea:        { label:'おすすめ',       tone:'amber', icon:'local_fire_department' },
+    praise:      { label:'神店',           tone:'teal',  icon:'favorite' },
+  };
+  function getReportCategory(key){
+    return REPORT_CATEGORIES[key] || REPORT_CATEGORIES.help;
+  }
+
+  // ---------- Actions ----------
+  function stampOfficial(id, btn){
+    if(!guardAction()) return;
+    const p = state.posts.find(x=>x.id===id);
+    if(p) p.seen = true;
+    // update button UI (keep same visual as other actions)
+    const icon = btn.querySelector('.ms');
+    const label = btn.querySelector('span:not(.ms)');
+    if(icon) icon.textContent = 'check_circle';
+    if(label) label.textContent = '確認済';
+    toast('確認しました');
+  }
+  
+function toggleWantPost(postId){
+    const doToggle = ()=>{
+      if(!state.wants) state.wants = new Set();
+      if(state.wants.has(postId)){
+        state.wants.delete(postId);
+        toast('行きたいから削除');
+      }else{
+        state.wants.add(postId);
+        toast('行きたいに追加');
+      }
+      // rerender current views
+      renderTimeline();
+      if(state.activeTab==='follow'){ renderFavScreen(); }
+      if(state.activeTab==='search'){ renderSearch(); }
+      updateWantStarsInDetail();
+    };
+
+    if(state.status==='guest'){
+      state._afterSmsAction = {type:'want', postId};
+      openModal('sms-modal');
+      smsReset();
+      return;
+    }
+    doToggle();
+  }
+
+  function updateWantStarsInDetail(){
+    // If post detail is open, re-render it to sync star icon
+    const detail = document.getElementById('post-detail');
+    if(!detail) return;
+    const openId = detail.getAttribute('data-open');
+    if(!openId) return;
+    openPost(openId);
+  }
+
+function likePost(postId){
+    // Guest can like (MVP: diffusion first)
+const p = state.posts.find(x=>x.id===postId);
+    if(!p) return;
+
+    p.userLiked = !p.userLiked;
+    if(!p.stats) p.stats = {like:0, comment:0};
+    if(p.userLiked){
+      p.stats.like = (p.stats.like||0) + 1;
+      toast('いいね！');
+    }else{
+      p.stats.like = Math.max(0, (p.stats.like||0) - 1);
+      toast('いいね解除');
+    }
+
+    // rerender current views to keep UI always in sync
+    renderTimeline();
+    if(state.activeTab==='follow' && (state.favMode==='liked' || state.favMode==='feed')){ renderFavScreen(); }
+    if(document.getElementById('screen-post')?.classList.contains('active')){
+      openPost(postId);
+    }
+  }
+
+  function toggleFollow(btn, key){
+    if(!guardAction()) return;
+    if(state.follows.has(key)){
+      state.follows.delete(key);
+      btn.textContent='フォロー';
+      btn.className='px-3 py-2 text-xs font-black border border-gray-300 rounded-sm';
+      toast('フォロー解除');
+    }else{
+      state.follows.add(key);
+      btn.textContent='フォロー中';
+      btn.className='px-3 py-2 text-xs font-black border border-[var(--brand)] text-[var(--brand)] bg-teal-50 rounded-sm';
+      toast('フォローしました');
+    }
+    // refresh follow feed if needed
+    if(state.activeTab==='follow' && state.favMode==='feed') renderFavScreen();
+  }
+
+  // ---------- Avatar ----------
+  function makeAvatarSVG(seed){
+    const colors = ['#00897B','#2563EB','#7C3AED','#DB2777','#111827','#0F766E','#F59E0B','#10B981','#EF4444'];
+    const c = colors[(seed-1)%colors.length];
+    const bg = '#E0F2F1';
+    return `
+      <svg viewBox="0 0 100 100" class="w-full h-full">
+        <rect width="100" height="100" fill="${bg}"></rect>
+        <circle cx="50" cy="44" r="18" fill="${c}"></circle>
+        <rect x="20" y="66" width="60" height="22" rx="11" fill="${c}" opacity="0.9"></rect>
+      </svg>
+    `;
+  }
+  function syncHeaderAvatar(){
+    const els = document.querySelectorAll('.header-avatar');
+    if(!els || !els.length) return;
+    els.forEach((el)=>{
+      if(state.persona==='personal'){
+        el.innerHTML = makeAvatarSVG(state.avatarSeed);
+        el.className = 'header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500';
+      } else {
+        // shop persona
+        el.innerHTML = `<span class="ms text-[22px]">storefront</span>`;
+        el.className = 'header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-emerald-600';
+      }
+    });
+  }
+
+  // ---------- Modal helpers ----------
+  function openModal(id){
+    const el = document.getElementById(id);
+    if(el) el.classList.add('active');
+  }
+  function closeModal(id){
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  }
+  function openOriginalModal(text){
+    const el = document.getElementById('original-text');
+    if(el) el.textContent = text || '';
+    openModal('original-modal');
+  }
+  function openOriginalForPost(postId){
+    const p = (state.posts || []).find(x=>x.id===postId);
+    if(!p || !hasOriginalText(p)) return;
+    openOriginalModal(p.textOriginal || '');
+  }
+  function show(id){ document.getElementById(id)?.classList.remove('hidden'); }
+  function hide(id){ document.getElementById(id)?.classList.add('hidden'); }
+
+  // ---------- Toast ----------
+  let toastTimer = null;
+  function toast(msg){
+    const el = document.getElementById('toast');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>el.classList.add('hidden'), 1400);
+  }
+
+
+  function openPostMenu(postId){
+    const p = (state.posts || []).find(x=>x.id===postId);
+    if(!p) return;
+
+    state.menuPostId = postId;
+
+    const authorName = p.author?.name || '投稿';
+    const authorKey = normalizeFollowKey(authorName);
+
+    const authorEl = document.getElementById('postmenu-author');
+    const subEl = document.getElementById('postmenu-sub');
+    const muteLabel = document.getElementById('postmenu-mute-label');
+
+    if(authorEl) authorEl.textContent = authorName;
+    if(subEl) subEl.textContent = `投稿メニュー（${formatPostTime(p) || ''}）`.trim();
+
+    const isMuted = state.mutedAuthors?.has(authorKey);
+    if(muteLabel) muteLabel.textContent = isMuted ? 'ミュート解除' : 'ミュート';
+
+    openModal('postmenu-modal');
+  }
+
+  function getMenuPost(){
+    const id = state.menuPostId;
+    if(!id) return null;
+    return (state.posts || []).find(x=>x.id===id) || null;
+  }
+
+  async function postMenuShare(){
+    const p = getMenuPost();
+    if(!p) return;
+    if(!guardAction()){ closeModal('postmenu-modal'); return; }
+    closeModal('postmenu-modal');
+
+    const baseUrl = location.href.split('#')[0];
+    const shareUrl = `${baseUrl}#post=${encodeURIComponent(p.id)}`;
+    const shareText = `${p.author?.name || '投稿'} / SocioVoice
+${(getPublicText(p) || '').slice(0,90)}${(getPublicText(p)||'').length>90?'…':''}`;
+
+    try{
+      if(navigator.share){
+        await navigator.share({ title:'SocioVoice', text:shareText, url:shareUrl });
+        toast('共有しました');
+        return;
+      }
+    }catch(e){
+      // fallthrough to clipboard
+    }
+
+    try{
+      await navigator.clipboard.writeText(shareUrl);
+      toast('リンクをコピーしました');
+    }catch(e){
+      toast('共有できませんでした');
+    }
+  }
+  async function sharePostDirect(postId){
+    state.menuPostId = postId;
+    await postMenuShare();
+  }
+
+
+  function postMenuToggleMute(){
+    const p = getMenuPost();
+    if(!p) return;
+    if(!guardAction()){ closeModal('postmenu-modal'); return; }
+    closeModal('postmenu-modal');
+
+    const authorName = p.author?.name || '';
+    const authorKey = normalizeFollowKey(authorName);
+
+    if(state.mutedAuthors?.has(authorKey)){
+      state.mutedAuthors.delete(authorKey);
+      toast('ミュート解除しました');
+    }else{
+      state.mutedAuthors.add(authorKey);
+      toast('ミュートしました');
+    }
+    renderTimeline();
+  }
+
+  function postMenuReport(){
+    const p = getMenuPost();
+    if(!p) return;
+    if(!guardAction()){ closeModal('postmenu-modal'); return; }
+    closeModal('postmenu-modal');
+
+    state.reportedPosts?.add(p.id);
+    renderTimeline();
+    toast('通報しました（Mock）');
+  }
+
+
+  // ---------- Utilities ----------
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
+  }
+
+  // Close modals on backdrop click (basic)
+  ['auth-modal','sms-modal','switcher-modal','original-modal','postmenu-modal'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', (e)=>{
+      if(e.target===el) closeModal(id);
+    });
+  });
+
+  // Initial
+  startSplash();
+  ensureSeededPosts();
+  renderTimeline();
+  renderHomeBanner();
+  renderAccount();
+  syncHeaderAvatar();
+
+  // Bind guards for any existing nodes
+  bindGuards();
+</script>
+</body>
+</html>

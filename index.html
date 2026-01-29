@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SocioVoice SHINBASHI | sv_shinbashi_v1_05</title>
+  <title>SocioVoice SHINBASHI | sv_shinbashi_v1_14</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
@@ -432,8 +432,12 @@
       border:2px solid #fff;
     }
     
+
+    /* HOT SHINBASHI module */
+    .hot-card{min-width:170px;max-width:190px}
+    .hot-card:focus{outline:2px solid var(--brand);outline-offset:2px}
 </style>
-  <meta name="sv_version" content="sv_shinbashi_v1_05">
+  <meta name="sv_version" content="sv_shinbashi_v1_14">
 </head>
 <body>
 <div id="app-frame">
@@ -682,7 +686,7 @@
         <!-- Want panel -->
         <div id="fav-panel-want" class="hidden">
           <div class="text-xs text-gray-500 leading-relaxed">
-            ⭐「行きたい」に入れた投稿の一覧です。
+            <span class="ms align-[-2px] text-gray-400">star</span>「行きたい」に入れた投稿の一覧です。
           </div>
 
           <div id="fav-want-timeline" class="mt-3 -mx-4 border-y border-gray-100 bg-white"></div>
@@ -814,9 +818,24 @@
           </div>
         </button>
       </div>
-    </header>
+    
+</header>
+
+    <div class="px-4 pt-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-1 text-xs text-gray-500 font-black">
+          <span class="ms text-[18px]">military_tech</span>
+          <span id="plan-rank-label">ランク 1</span>
+        </div>
+        <button class="tap px-3 py-2 text-xs font-black rounded-sm border border-gray-200 bg-white text-gray-700 flex items-center gap-1" onclick="openCreatePlan()" aria-label="企画を作成">
+          <span class="ms text-[18px]">add</span>
+          企画を作成
+        </button>
+      </div>
+    </div>
 
     <div class="px-4 pt-3 pb-24">
+
       <div class="text-base font-black text-gray-900">企画</div>
       <div class="text-xs text-gray-500 mt-1 leading-relaxed">
         新橋の「縛り」で遊ぶ。投稿→行動につながるかを測る入口。
@@ -827,15 +846,83 @@
         <div class="text-sm font-black mt-1">終電まで：立ち飲み縛り（〜3,000円）</div>
         <div class="text-xs text-gray-500 mt-1">「行きたい」→現地で1投稿（またはチェックイン）で完走。</div>
         <div class="mt-3 flex gap-2">
-          <button class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>toast('参加しました（Mock）'))">参加</button>
-          <button class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="toast('詳細は後で（Mock）')">詳細</button>
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>joinTodayPlan())">参加</button>
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="openPlanDetail('today')">詳細</button>
         </div>
       </div>
+
+
+      <div id="plan-joined" class="mt-4 p-4 rounded-xl border border-gray-100 bg-white hidden">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-xs text-gray-500 font-bold">参加中</div>
+            <div class="text-sm font-black mt-1">終電まで：立ち飲み縛り（〜3,000円）</div>
+            <div id="plan-progress" class="text-xs text-gray-500 mt-1">あと1ステップ：投稿（またはチェックイン）</div>
+          </div>
+          <div class="w-9 h-9 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+            <span class="ms">flag</span>
+          </div>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>{ openComposer({planId: state.plan?.planId || 'today'}); toast('投稿画面へ（企画参加中）'); })">投稿する</button>
+          <button class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="guardAction(()=>completeTodayPlan())">完走</button>
+        </div>
+      </div>
+
 
       <div class="mt-4">
         <div class="text-xs text-gray-500 font-black mb-2">みんなの企画</div>
         <div id="plan-list" class="space-y-2"></div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="screen-plan-detail" class="screen">
+  <div class="screen-scroll">
+    <header class="header px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button class="tap text-gray-500 px-2 py-2" onclick="closePlanDetail()" aria-label="戻る"><span class="ms">arrow_back</span></button>
+        <div class="font-black text-base text-gray-900">企画詳細</div>
+      </div>
+      <button class="tap" onclick="openAccount()" aria-label="アカウント">
+        <div class="header-avatar w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+          <span class="ms text-[22px]">person</span>
+        </div>
+      </button>
+    </header>
+
+    <div class="px-4 pt-4 pb-24">
+      <div class="p-4 rounded-xl border border-gray-100 bg-white">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-xs text-gray-500 font-bold" id="plan-detail-kicker">—</div>
+            <div class="text-lg font-black mt-1 leading-snug" id="plan-detail-title">—</div>
+            <div class="text-xs text-gray-500 mt-1" id="plan-detail-sub">—</div>
+          </div>
+          <div class="w-10 h-10 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
+            <span class="ms" id="plan-detail-icon">flag</span>
+          </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-2" id="plan-detail-rules"></div>
+
+        <div class="mt-4 flex gap-2">
+          <button id="plan-detail-joinbtn" class="tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white" onclick="guardAction(()=>joinPlanFromDetail())">参加</button>
+          <button id="plan-detail-postbtn" class="tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700" onclick="guardAction(()=>postInPlanFromDetail())">企画に投稿</button>
+        </div>
+
+        <div class="mt-3 text-[11px] text-gray-500 leading-relaxed">
+          参加はログ取得のため。投稿は既存の投稿フォームを流用して、企画に紐づける（Mock）。
+        </div>
+      
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">この企画の投稿</div>
+        <div id="plan-detail-feed" class="space-y-3"></div>
+        <div id="plan-detail-empty" class="hidden text-sm text-gray-400 mt-6">まだ投稿がありません</div>
+      </div>
+</div>
     </div>
   </div>
 </section>
@@ -971,6 +1058,19 @@
           <div class="text-xs text-gray-500">発信者</div>
           <div class="font-black text-sm mt-1" id="compose-author">—</div>
         </div>
+        <div id="compose-planbox" class="mt-3 border border-gray-200 rounded-sm px-4 py-3 bg-white hidden">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="ms text-gray-500">flag</span>
+              <div class="min-w-0">
+                <div class="text-[11px] font-black text-gray-500">企画に投稿</div>
+                <div id="compose-planname" class="text-sm font-black text-gray-900 truncate">—</div>
+              </div>
+            </div>
+            <button class="tap px-2 py-2 text-gray-500" aria-label="企画を外す" onclick="clearComposePlan()"><span class="ms">close</span></button>
+          </div>
+        </div>
+
 
         <div class="mt-3 border border-gray-200 rounded-sm p-4">
           <div class="text-xs font-black text-gray-500 mb-2">投稿タイプ</div>
@@ -978,6 +1078,49 @@
             <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('normal')" id="type-normal">通常</button>
             <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('report')" id="type-report">今夜レポ</button>
             <button class="py-3 text-xs font-black border border-gray-300 rounded-sm" onclick="setComposeType('petition')" id="type-petition">注意</button>
+          </div>
+        </div>
+
+        <div class="mt-3 border border-gray-200 rounded-sm p-4">
+          <div class="text-xs font-black text-gray-500 mb-3">評価（任意）</div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">paid</span> コスパ
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-cost-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('cost',1)">安い</button>
+                <button id="rate-cost-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('cost',2)">ふつう</button>
+                <button id="rate-cost-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('cost',3)">高め</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">schedule</span> タイパ
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-time-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('time',1)">早い</button>
+                <button id="rate-time-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('time',2)">ふつう</button>
+                <button id="rate-time-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('time',3)">遅い</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs font-black text-gray-600">
+                <span class="ms" style="font-size:18px">groups</span> 雰囲気
+              </div>
+              <div class="inline-flex rounded-sm overflow-hidden border border-gray-200">
+                <button id="rate-vibe-1" class="px-3 py-2 text-xs font-black" onclick="setComposeRating('vibe',1)">静か</button>
+                <button id="rate-vibe-2" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('vibe',2)">ふつう</button>
+                <button id="rate-vibe-3" class="px-3 py-2 text-xs font-black border-l border-gray-200" onclick="setComposeRating('vibe',3)">賑やか</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-[11px] text-gray-400 leading-relaxed">
+            ※同じボタンをもう一度押すと解除できます（任意）。
           </div>
         </div>
 
@@ -1068,6 +1211,92 @@
   </div>
 
 <!-- Account switcher -->
+  
+  <!-- Rank guard: plan creation -->
+  <div id="rank-modal" class="modal fixed inset-0 z-[125] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900 flex items-center gap-2">
+          <span class="ms text-[20px] text-[var(--brand)]">military_tech</span>
+          企画作成の条件
+        </div>
+        <button class="tap text-gray-500" onclick="closeModal('rank-modal')" aria-label="閉じる"><span class="ms">close</span></button>
+      </div>
+
+      <div class="mt-4 border border-gray-200 rounded-sm p-4 bg-white">
+        <div class="text-xs text-gray-500 font-black">現在のランク</div>
+        <div class="text-2xl font-black text-gray-900 mt-1" id="rank-modal-current">ランク 1</div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">企画を作成するには</div>
+        <div class="flex items-start gap-3 p-3 border border-gray-200 rounded-sm">
+          <span class="ms text-[20px] text-gray-600">check_circle</span>
+          <div class="min-w-0">
+            <div class="text-sm font-black text-gray-900">ランク10以上</div>
+            <div class="text-xs text-gray-500 mt-1 leading-relaxed">
+              投稿・企画完走など、活動量が一定以上になるとランクが上がります。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">ランクを上げる例</div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">edit</span>
+            投稿する
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">task_alt</span>
+            企画を完走する
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <span class="ms text-[18px] text-gray-600">forum</span>
+            コメントで参加する
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button class="bg-[var(--brand)] text-white font-black w-full py-3 rounded-sm" onclick="closeModal('rank-modal')">了解</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan create modal (MVP) -->
+  <div id="plan-create-modal" class="modal fixed inset-0 z-[126] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm border border-gray-200 p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-gray-900 flex items-center gap-2">
+          <span class="ms text-[20px] text-[var(--brand)]">add</span>
+          企画を作成
+        </div>
+        <button class="tap text-gray-500" onclick="closeModal('plan-create-modal')" aria-label="閉じる"><span class="ms">close</span></button>
+      </div>
+
+      <div class="mt-4">
+        <label class="text-xs text-gray-500 font-black">企画名</label>
+        <input id="plan-create-title" class="mt-2 w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：終電まで：はしご縛り（2軒）" />
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-gray-500 font-black mb-2">縛り（最大3つ）</div>
+        <div class="space-y-2">
+          <input id="plan-create-rule1" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：新橋エリア" />
+          <input id="plan-create-rule2" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：予算〜3,000円" />
+          <input id="plan-create-rule3" class="w-full border border-gray-200 rounded-sm px-3 py-3 text-sm" placeholder="例：立ち飲み優先" />
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button class="bg-[var(--brand)] text-white font-black w-full py-3 rounded-sm" onclick="submitCreatePlan()">作成</button>
+        <button class="mt-3 w-full py-2 text-xs text-gray-400" onclick="closeModal('plan-create-modal')">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <div id="switcher-modal" class="modal fixed inset-0 z-[125] items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
     <div class="bg-white w-full max-w-sm border border-gray-200 p-5 shadow-xl">
       <div class="flex items-center justify-between">
@@ -1207,7 +1436,10 @@
     homeStream: 'town',
     nickname: 'ヒロシ',
     avatarSeed: 1,
+    rank: 1,
+    customPlans: [],
     activeTab: 'home',
+    plan: { joined:false, completed:false },
     favMode: 'liked', // feed | want | liked | follow
     persona: 'personal', // personal or shop:<id>
     shops: [
@@ -1222,13 +1454,36 @@
     menuPostId: null,
     posts: [],
     lastScreenBeforePost: 'home',
-    compose: { type:'normal' },
+    compose: { type:'normal', planId:null, planTitle:null, ratings:{cost:null,time:null,vibe:null} },
     profile: {
       optionalAttrs: [],
       showOptionalAttrs: true,
       lastNicknameChange: 0
     }
   };
+
+
+  // ---------- Rank (MVP) ----------
+  function getRank(){
+    const r = Number(state.rank || 1);
+    return Number.isFinite(r) ? r : 1;
+  }
+  function bumpRank(delta){
+    const d = Number(delta || 0);
+    const next = Math.max(1, getRank() + (Number.isFinite(d) ? d : 0));
+    state.rank = next;
+    updateRankUI();
+  }
+  function updateRankUI(){
+    const txt = 'ランク ' + String(getRank());
+    const a = document.getElementById('plan-rank-label');
+    if(a) a.textContent = txt;
+    const b = document.getElementById('rank-modal-current');
+    if(b) b.textContent = txt;
+    const c = document.getElementById('account-rank');
+    if(c) c.textContent = txt;
+  }
+
 
   // ---------- Navigation ----------
   function setTabbarVisibility(screenId){
@@ -1312,27 +1567,279 @@ function getUnreadNotifCount(){
   }
 
 
+
 function renderPlan(){
     const list = document.getElementById('plan-list');
     if(!list) return;
-    // simple static list (MVP)
-    const plans = [
-      {title:'せんべろ縛り（〜2,000円）', sub:'0次会に強い。1軒だけでもOK。', icon:'payments'},
-      {title:'喫煙可だけ縛り', sub:'愛煙家向け。静かめ優先。', icon:'smoking_rooms'},
-      {title:'〆ラーメン縛り', sub:'最後は必ず麺で締める。', icon:'ramen_dining'}
-    ];
+
+    const PLAN_DEFS = getPlanDefs();
+    updateRankUI();
+
+    // joined block (MVP)
+    const joined = document.getElementById('plan-joined');
+    const prog = document.getElementById('plan-progress');
+    const joinedTitle = joined?.querySelector('.text-sm.font-black.mt-1');
+    if(joined){
+      const isJoined = !!(state.plan && state.plan.joined);
+      joined.classList.toggle('hidden', !isJoined);
+      if(joinedTitle && isJoined){
+        joinedTitle.textContent = state.plan.title || PLAN_DEFS[state.plan.planId || 'today']?.title || '企画';
+      }
+      if(prog){
+        prog.textContent = (state.plan && state.plan.completed)
+          ? '完走しました。おつかれ！'
+          : 'あと1ステップ：投稿（またはチェックイン）';
+      }
+    }
+
+    // list
+    const plans = Object.values(PLAN_DEFS).filter(p=>p.id!=='today');
     list.innerHTML = plans.map(p=>`
-      <div class="p-3 rounded-xl border border-gray-100 bg-white flex gap-3 items-start">
+      <div class="p-3 rounded-xl border border-gray-100 bg-white flex gap-3 items-start tap" onclick="openPlanDetail('${p.id}')">
         <div class="w-9 h-9 rounded-full border border-gray-100 bg-white flex items-center justify-center text-gray-500 shrink-0">
           <span class="ms">${p.icon}</span>
         </div>
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1">
           <div class="text-sm font-black truncate">${escapeHtml(p.title)}</div>
           <div class="text-xs text-gray-500 mt-0.5">${escapeHtml(p.sub)}</div>
+        </div>
+        <div class="shrink-0 flex items-center">
+          <button class="tap px-2 py-2 text-gray-500" aria-label="詳細" onclick="event.stopPropagation(); openPlanDetail('${p.id}')"><span class="ms">chevron_right</span></button>
         </div>
       </div>
     `).join('');
   }
+
+
+
+function getPlanDefs(){
+    const base = {
+      today: {
+        id:'today',
+        kicker:'今日の企画',
+        title:'終電まで：立ち飲み縛り（〜3,000円）',
+        sub:'「行きたい」→現地で1投稿（またはチェックイン）で完走。',
+        icon:'flag',
+        rules:['新橋エリア','予算〜3,000円','立ち飲み優先']
+      },
+      senbero: {
+        id:'senbero',
+        kicker:'みんなの企画',
+        title:'せんべろ縛り（〜2,000円）',
+        sub:'0次会に強い。1軒だけでもOK。',
+        icon:'payments',
+        rules:['予算〜2,000円','1軒でもOK','写真推奨']
+      },
+      smoke: {
+        id:'smoke',
+        kicker:'みんなの企画',
+        title:'喫煙・禁煙で分岐（好み一致）',
+        sub:'同じ派閥で行動しやすくする。',
+        icon:'smoke_free',
+        rules:['喫煙可 or 禁煙','店の雰囲気重視','写真推奨']
+      }
+    };
+
+    const customs = {};
+    (state.customPlans || []).forEach(p=>{
+      if(!p || !p.id) return;
+      customs[p.id] = p;
+    });
+
+    return { ...base, ...customs };
+  }
+
+function joinPlan(planId){
+    const defs = getPlanDefs();
+    const d = defs[planId] || defs.today;
+    state.plan = state.plan || {};
+    state.plan.joined = true;
+    state.plan.completed = false;
+    state.plan.planId = d.id;
+    state.plan.title = d.title;
+    toast('参加しました');
+    renderPlan();
+  }
+
+function completePlan(){
+    state.plan = state.plan || {};
+    const wasCompleted = !!state.plan.completed;
+    if(!state.plan.joined){ state.plan.joined = true; }
+    state.plan.completed = true;
+    if(!wasCompleted) bumpRank(1);
+    toast('完走しました（Mock）');
+    renderPlan();
+  }
+
+function joinTodayPlan(){ joinPlan('today'); }
+function completeTodayPlan(){ completePlan(); }
+
+function openCreatePlan(){
+    // guest -> SMS login
+    if(state.status==='guest'){
+      state._afterSmsAction = { type:'createPlan' };
+      openModal('sms-modal');
+      smsReset();
+      return;
+    }
+    // rank gate
+    if(getRank() < 10){
+      updateRankUI();
+      openModal('rank-modal');
+      return;
+    }
+    // open create modal
+    const t = document.getElementById('plan-create-title');
+    const r1 = document.getElementById('plan-create-rule1');
+    const r2 = document.getElementById('plan-create-rule2');
+    const r3 = document.getElementById('plan-create-rule3');
+    if(t) t.value = '';
+    if(r1) r1.value = '';
+    if(r2) r2.value = '';
+    if(r3) r3.value = '';
+    openModal('plan-create-modal');
+  }
+
+function submitCreatePlan(){
+    if(state.status==='guest'){
+      state._afterSmsAction = { type:'createPlan' };
+      openModal('sms-modal');
+      smsReset();
+      return;
+    }
+    if(getRank() < 10){
+      updateRankUI();
+      closeModal('plan-create-modal');
+      openModal('rank-modal');
+      return;
+    }
+
+    const title = (document.getElementById('plan-create-title')?.value || '').trim();
+    const rule1 = (document.getElementById('plan-create-rule1')?.value || '').trim()
+    const rule2 = (document.getElementById('plan-create-rule2')?.value || '').trim()
+    const rule3 = (document.getElementById('plan-create-rule3')?.value || '').trim()
+
+    if(!title){
+      toast('企画名を入力してください');
+      return;
+    }
+
+    const rules = [rule1, rule2, rule3].filter(Boolean).slice(0,3);
+    const id = 'uplan_' + Date.now().toString(36);
+
+    const plan = {
+      id,
+      kicker:'みんなの企画',
+      title,
+      sub:'ユーザー作成の企画（Mock）',
+      icon:'flag',
+      rules: rules.length ? rules : ['ルール未設定']
+    };
+
+    if(!state.customPlans) state.customPlans = [];
+    state.customPlans.unshift(plan);
+    closeModal('plan-create-modal');
+    toast('企画を作成しました');
+    renderPlan();
+  }
+
+function openPlanDetail(planId){
+    state.planDetailId = planId || 'today';
+    renderPlanDetail();
+    nav('plan-detail');
+  }
+
+function closePlanDetail(){
+    goTab('plan');
+  }
+
+function renderPlanDetail(){
+    const defs = getPlanDefs();
+    const d = defs[state.planDetailId || 'today'] || defs.today;
+
+    const kicker = document.getElementById('plan-detail-kicker');
+    const title = document.getElementById('plan-detail-title');
+    const sub = document.getElementById('plan-detail-sub');
+    const icon = document.getElementById('plan-detail-icon');
+    const rules = document.getElementById('plan-detail-rules');
+    const joinBtn = document.getElementById('plan-detail-joinbtn');
+    const postBtn = document.getElementById('plan-detail-postbtn');
+
+    kicker && (kicker.textContent = d.kicker || '企画');
+    title && (title.textContent = d.title || '—');
+    sub && (sub.textContent = d.sub || '');
+    icon && (icon.textContent = d.icon || 'flag');
+    if(rules){
+      rules.innerHTML = (d.rules||[]).slice(0,6).map(r=>`
+        <span class="chip chip--outline"><span class="ms">label</span>${escapeHtml(r)}</span>
+      `).join('');
+    }
+
+    const joinedThis = !!(state.plan?.joined && (state.plan.planId===d.id));
+    if(joinBtn){
+      joinBtn.textContent = joinedThis ? '参加済み' : '参加';
+      joinBtn.disabled = joinedThis;
+      joinBtn.className = joinedThis
+        ? 'tap px-3 py-2 text-xs font-black rounded-lg border border-gray-200 bg-gray-50 text-gray-400'
+        : 'tap px-3 py-2 text-xs font-black rounded-lg bg-[var(--brand)] text-white';
+    }
+    if(postBtn){
+      postBtn.textContent = '企画に投稿';
+    }
+
+    renderPlanDetailTimeline(d.id);
+  }
+
+
+function renderPlanDetailTimeline(planId){
+    ensureSeededPosts();
+    const feed = document.getElementById('plan-detail-feed');
+    const empty = document.getElementById('plan-detail-empty');
+    if(!feed) return;
+
+    let posts = (state.posts || []).filter(p=>p.planId===planId);
+
+    // Filter: reported posts (hidden)
+    if(state.reportedPosts && state.reportedPosts.size){
+      posts = posts.filter(p=>!state.reportedPosts.has(p.id));
+    }
+
+    // Filter: muted authors (hidden)
+    if(state.mutedAuthors && state.mutedAuthors.size){
+      posts = posts.filter(p=>{
+        const key = normalizeFollowKey(p.author?.name || '');
+        return !state.mutedAuthors.has(key);
+      });
+    }
+
+    // Guest: keep small preview
+    if(state.status==='guest'){
+      posts = posts.slice(0,2);
+    }
+
+    if(!posts.length){
+      feed.innerHTML = '';
+      empty && empty.classList.remove('hidden');
+      return;
+    }
+    empty && empty.classList.add('hidden');
+    feed.innerHTML = posts.map(p=>renderPostCard(p)).join('') + `<div class="h-2"></div>`;
+    bindPostOpeners();
+    bindGuards();
+  }
+
+function joinPlanFromDetail(){
+    joinPlan(state.planDetailId || 'today');
+    renderPlanDetail();
+  }
+
+function postInPlanFromDetail(){
+    const defs = getPlanDefs();
+    const d = defs[state.planDetailId || 'today'] || defs.today;
+    openComposer({planId:d.id, planTitle:d.title});
+    toast('企画に投稿（Mock）');
+  }
+
 
 function renderNotif(){
     const list = document.getElementById('notif-list');
@@ -1948,6 +2455,7 @@ function renderLikedPosts(){
     if(state._afterSmsAction){
       const a = state._afterSmsAction; state._afterSmsAction = null;
       if(a.type==='want' && a.postId){ toggleWantPost(a.postId); }
+      if(a.type==='createPlan'){ openCreatePlan(); }
     }
   }
 
@@ -2111,8 +2619,10 @@ function renderLikedPosts(){
         kind:'shop',
         author:{type:'shop', name:'立呑み「銀の樽」', badge:'SHOP', icon:'local_bar', place:'新橋駅西口', now:true},
         meta:{ts:now - 14*60*1000, time:'14分前', tag:'空席', tagTone:'teal', tagIcon:'event_seat'},
+        planId:'today',
+        planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
         text:'【〜19:00】ハッピーアワーやってます。サク飲み歓迎🍺',
-        media:[{type:'image', label:'Happy Hour', ratio:'video'}],
+        media:[{type:'image', label:'Happy Hour', ratio:'video', src:'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1200&q=60'}],
         stats:{like:23, comment:3}
       },
       {
@@ -2120,6 +2630,8 @@ function renderLikedPosts(){
         kind:'user',
         author:{type:'user', name: state.nickname || 'ヒロシ', badges:['はしご派','0次会'], icon:'person'},
         meta:{ts:now - 28*60*1000, time:'28分前'},
+        planId:'today',
+        planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
         textPublic:'終電前の0次会って、みんなどこから入る？\n「一杯だけ・静かめ」だと西口側がラクだった。',
         stats:{like:41, comment:9}
       },
@@ -2129,7 +2641,7 @@ function renderLikedPosts(){
         author:{type:'shop', name:'串焼き しんばし太郎', badge:'SHOP', icon:'restaurant', place:'烏森口'},
         meta:{ts:now - 52*60*1000, time:'52分前', tag:'おすすめ', tagTone:'teal', tagIcon:'thumb_up'},
         text:'本日、串5本セットが少しお得です。1軒目にも2軒目にもどうぞ。',
-        media:[{type:'image', label:'Yakitori Set', ratio:'video'}],
+        media:[{type:'image', label:'Yakitori Set', ratio:'video', src:'https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=60'}],
         ticket:{ title:'串5本セット 50円引き', note:'※19:00まで', remain:'残り 28枚' },
         stats:{like:19, comment:2}
       },
@@ -2157,7 +2669,7 @@ function renderLikedPosts(){
         author:{type:'shop', name:'餃子スタンド 88', badge:'SHOP', icon:'ramen_dining', place:'SL広場側', now:true},
         meta:{ts:now - 3*60*60*1000, time:'3時間前'},
         text:'【本日】餃子＋ハイボールのセットあります。0次会にも〆にも。',
-        media:[{type:'image', label:'Gyoza & Highball', ratio:'video'}],
+        media:[{type:'image', label:'Gyoza & Highball', ratio:'video', src:'https://images.unsplash.com/photo-1604908554260-3d1d09d2d1e9?auto=format&fit=crop&w=1200&q=60'}],
         stats:{like:34, comment:4}
       },
       {
@@ -2168,7 +2680,7 @@ function renderLikedPosts(){
         title:'「呼び込み」って断り方の正解ある？',
         textPublic:'声かけが多い時、角が立たない断り方を知りたい。\n（※言い回しを整えて表示）',
         textOriginal:'呼び込みうざい。断ってもついてくる時どうすりゃいいの？',
-        actions:{reacts:[{k:'🤔 懸念あり', n:15, needVerify:true},{k:'💡 アイデア', n:12, needVerify:true}]},
+        actions:{reacts:[{k:'懸念', n:15, needVerify:true},{k:'アイデア', n:12, needVerify:true}]},
         stats:{like:58, comment:17}
       },
       {
@@ -2179,6 +2691,113 @@ function renderLikedPosts(){
         text:'〆にどうぞ。今夜は天ぷらが揚がってます。',
         stats:{like:12, comment:0}
       }
+      ,
+      {
+        id:'post-10',
+        kind:'user',
+        author:{type:'user', name:'マサ', badges:['ガード下'], icon:'person'},
+        meta:{ts:now - 9*60*60*1000, time:'9時間前', tag:'写真', tagTone:'slate', tagIcon:'photo_camera'},
+        title:'ガード下、今日はわりと歩きやすい',
+        textPublic:'人の流れが速めで、声かけも少なめ。サク飲み→次に移るなら今が楽。',
+        media:[{type:'image', label:'Underpass Night', ratio:'video', src:'https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1200&q=60'}],
+        ratings:{cost:2,time:1,vibe:3},
+        stats:{like:44, comment:6}
+      },
+      {
+        id:'post-11',
+        kind:'shop',
+        author:{type:'shop', name:'ハイボール研究所', badge:'SHOP', icon:'local_bar', place:'新橋駅近'},
+        meta:{ts:now - 10*60*60*1000, time:'10時間前', tag:'おすすめ', tagTone:'teal', tagIcon:'thumb_up'},
+        text:'ハイボール各種、今夜は柑橘系が多め。最初の1杯にどうぞ。',
+        media:[{type:'image', label:'Highball', ratio:'video', src:'https://images.unsplash.com/photo-1528823872057-9c018a7c06a3?auto=format&fit=crop&w=1200&q=60'}],
+        stats:{like:21, comment:1}
+      },
+      {
+        id:'post-12',
+        kind:'discussion',
+        author:{type:'user', name:'リョウ', badges:['二次会'], icon:'person'},
+        meta:{ts:now - 11*60*60*1000, time:'11時間前'},
+        title:'二次会、静かめに切り替えるタイミングっていつ？',
+        textPublic:'賑やか→静かめに移る時のおすすめ導線ある？',
+        pills:[{label:'一次会で切る', n:12},{label:'22時で切る', n:17},{label:'気分次第', n:9}]
+      },
+      {
+        id:'post-13',
+        kind:'user',
+        author:{type:'user', name:'ユウキ', badges:['0次会'], icon:'person'},
+        meta:{ts:now - 12*60*60*1000, time:'12時間前', tag:'行きたい', tagTone:'amber', tagIcon:'star'},
+        title:'0次会メモ：立ち飲み→串→〆',
+        textPublic:'まず一杯、次に串で腹を決めて、最後に軽く〆るのが安定だった。',
+        ratings:{cost:1,time:1,vibe:2},
+        stats:{like:38, comment:4}
+      },
+      {
+        id:'post-14',
+        kind:'user',
+        author:{type:'user', name:'サトミ', badges:['〆派'], icon:'person'},
+        meta:{ts:now - 13*60*60*1000, time:'13時間前', tag:'〆', tagTone:'slate', tagIcon:'nightlight'},
+        title:'〆ラーメン、今日は塩が良かった',
+        textPublic:'脂が重くないやつ。終電前でもいける。',
+        media:[{type:'image', label:'Ramen', ratio:'video', src:'https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=1200&q=60'}],
+        ratings:{cost:2,time:2,vibe:2},
+        stats:{like:27, comment:2}
+      },
+      {
+        id:'post-15',
+        kind:'user',
+        author:{type:'user', name:'タケル', badges:['静かめ'], icon:'person'},
+        meta:{ts:now - 14*60*60*1000, time:'14時間前', tag:'静かめ', tagTone:'slate', tagIcon:'volume_off'},
+        title:'会話したい日は、席の間隔広い店が楽',
+        textPublic:'音量が低めだと、テンション保ったまま話せる。',
+        ratings:{cost:2,time:2,vibe:1},
+        stats:{like:22, comment:3}
+      },
+      {
+        id:'post-16',
+        kind:'shop',
+        author:{type:'shop', name:'小さな和食 みなと', badge:'SHOP', icon:'restaurant', place:'汐留寄り'},
+        meta:{ts:now - 15*60*60*1000, time:'15時間前', tag:'禁煙', tagTone:'slate', tagIcon:'smoke_free'},
+        text:'禁煙席のみ。遅めの時間は落ち着きます。',
+        stats:{like:9, comment:0}
+      },
+      {
+        id:'post-17',
+        kind:'discussion',
+        author:{type:'user', name:'ナオ', badges:['予算'], icon:'person'},
+        meta:{ts:now - 16*60*60*1000, time:'16時間前'},
+        title:'予算5,000円なら、どんな組み方が満足？',
+        textPublic:'0次会〜〆まで、現実的なルート知りたい。',
+        pills:[{label:'1軒でゆっくり', n:8},{label:'2軒はしご', n:19},{label:'軽く3軒', n:11}]
+      },
+      {
+        id:'post-18',
+        kind:'user',
+        author:{type:'user', name:'ケン', badges:['写真'], icon:'person'},
+        meta:{ts:now - 17*60*60*1000, time:'17時間前', tag:'SL広場', tagTone:'slate', tagIcon:'train'},
+        title:'SL広場側、集合しやすいけど混む',
+        textPublic:'待ち合わせは端の方が良い。真ん中は詰まる。',
+        media:[{type:'image', label:'Crowd', ratio:'video', src:'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&w=1200&q=60'}],
+        stats:{like:31, comment:5}
+      },
+      {
+        id:'post-19',
+        kind:'shop',
+        author:{type:'shop', name:'酒場 さくっと', badge:'SHOP', icon:'local_bar', place:'西口'},
+        meta:{ts:now - 18*60*60*1000, time:'18時間前', tag:'空席', tagTone:'teal', tagIcon:'event_seat'},
+        text:'23時台は回転早め。1〜2名なら入りやすいです。',
+        stats:{like:14, comment:1}
+      },
+      {
+        id:'post-20',
+        kind:'debate',
+        author:{type:'user', name:'ミホ', badges:['注意'], icon:'person'},
+        meta:{ts:now - 20*60*60*1000, time:'20時間前', flag:'AI整形', flagIcon:'auto_fix_high', flagTone:'purple'},
+        title:'声かけが強い時、どう離脱する？',
+        textPublic:'角が立たない返しと、離脱のコツが知りたい。',
+        actions:{reacts:[{k:'懸念', n:11, needVerify:true},{k:'対策', n:18, needVerify:true}]},
+        stats:{like:46, comment:13}
+      }
+
     ];
   }
 
@@ -2219,14 +2838,120 @@ function renderTimeline(){
       });
     }
 
+    // HOT SHINBASHI picks should be computed before guest slicing
+    const hotPicks = getHotShinbashiPicks(posts);
+
     // In guest mode (preview), user should be on guest screen; still keep safe:
     if(state.status==='guest'){
       posts = posts.slice(0,2);
     }
 
-    tl.innerHTML = posts.map(p=>renderPostCard(p)).join('') + `<div class="h-6"></div>`;
+    // Build timeline with an inserted "HOT SHINBASHI" module after 2 posts (recommended)
+    const parts = [];
+    posts.forEach((p, idx)=>{
+      parts.push(renderPostCard(p));
+      if(idx===1 && hotPicks.length){
+        parts.push(renderHotShinbashiModule(hotPicks));
+      }
+    });
+
+    // If there were <2 posts but we still have picks, append at end
+    if(posts.length<2 && hotPicks.length){
+      parts.push(renderHotShinbashiModule(hotPicks));
+    }
+
+    tl.innerHTML = parts.join('') + `<div class="h-6"></div>`;
     bindPostOpeners();
     bindGuards();
+  }
+
+  // HOT SHINBASHI: rule-based picks (MVP)
+  function getHotShinbashiPicks(posts){
+    const kws = ['新橋','烏森','SL','ガード下','立ち飲','立呑','ハイボール','串','餃子','終電','0次会','二次会','サク飲','西口','東口','汐留'];
+    const now = Date.now();
+    const DAY = 24*60*60*1000;
+
+    const scored = (posts||[])
+      .filter(p=>Array.isArray(p.media) && p.media.length && p.media[0].type==='image')
+      .filter(p=>{
+        const ts = p?.meta?.ts;
+        if(typeof ts==='number' && Number.isFinite(ts)){
+          return (now - ts) <= DAY;
+        }
+        return true; // if unknown, keep in MVP
+      })
+      .map(p=>{
+        const hay = `${p.title||''}\n${getPublicText(p)||''}\n${(p.text||'')}\n${(p.author?.name||'')}`.toLowerCase();
+        const kwHit = kws.reduce((acc, w)=>{
+          return acc + (hay.includes(String(w).toLowerCase()) ? 1 : 0);
+        }, 0);
+
+        const like = Number(p?.stats?.like||0);
+        const comment = Number(p?.stats?.comment||0);
+        const wantBoost = (state.wants && state.wants.has(p.id)) ? 6 : 0;
+
+        // Prefer user posts slightly over shop posts for "SNSっぽさ"
+        const typeBoost = p.author?.type==='user' ? 6 : (p.author?.type==='shop' ? 2 : 0);
+
+        // Freshness boost (smaller is better)
+        const ts = Number(p?.meta?.ts||now);
+        const minutesAgo = Math.max(0, Math.round((now - ts)/60000));
+        const freshBoost = Math.max(0, 25 - Math.min(25, Math.floor(minutesAgo/10))); // up to +25
+
+        const score = kwHit*6 + like + comment*2 + wantBoost + typeBoost + freshBoost;
+        return {p, score};
+      })
+      .sort((a,b)=>b.score-a.score);
+
+    // De-dup by author (max 2) to avoid "店宣伝" domination
+    const byAuthor = new Map();
+    const picks = [];
+    for(const it of scored){
+      const k = normalizeFollowKey(it.p.author?.name || 'unknown');
+      const n = byAuthor.get(k) || 0;
+      if(n>=2) continue;
+      byAuthor.set(k, n+1);
+      picks.push(it.p);
+      if(picks.length>=6) break;
+    }
+    return picks;
+  }
+
+  function renderHotShinbashiModule(picks){
+    const cards = (picks||[]).map(p=>{
+      const m = (p.media||[])[0];
+      const img = m ? (m.src ? `<div class="w-full aspect-video rounded-sm overflow-hidden bg-gray-100"><img src="${escapeHtml(m.src)}" alt="${escapeHtml(m.label||'Photo')}" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" /></div>` : `<div class="img-placeholder w-full aspect-video rounded-sm">[Image: ${escapeHtml(m.label||'Photo')}]</div>`) : '';
+      const dt = formatPostTime(p);
+      const name = escapeHtml(p.author?.name || '');
+      const meta = `<div class="mt-2 text-[11px] text-gray-500 flex items-center justify-between gap-2">
+          <span class="truncate">${name}</span>
+          <span class="shrink-0">${dt}</span>
+        </div>`;
+      return `<div class="hot-card tap" role="button" tabindex="0" data-open="${p.id}">
+        ${img}
+        ${meta}
+      </div>`;
+    }).join('');
+
+    return `
+      <section class="bg-white border-b border-gray-100 px-4 py-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="ms text-[18px] text-[var(--brand)]">local_fire_department</span>
+            <div class="min-w-0">
+              <div class="text-sm font-black tracking-wide truncate">HOT SHINBASHI</div>
+              <div class="text-[11px] text-gray-500">直近24hの写真投稿からピックアップ</div>
+            </div>
+          </div>
+          <button class="tap px-2 py-2 rounded-full" onclick="toast('特集の条件（Mock）')" aria-label="詳細">
+            <span class="ms text-[18px] text-gray-400">info</span>
+          </button>
+        </div>
+        <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+          ${cards || `<div class="text-xs text-gray-400">まだ写真投稿がありません</div>`}
+        </div>
+      </section>
+    `;
   }
 
   function normalizeFollowKey(name){
@@ -2351,6 +3076,12 @@ function renderTimeline(){
 
     }
 
+    // Plan
+    if(p.planId){
+      const label = p.planTitle || '企画';
+      chips.push(`<span class="chip chip--outline"><span class="ms">flag</span>${escapeHtml(label)}</span>`);
+    }
+
     // Place / time
     if(p.author.place){
       chips.push(`<span class="chip chip--outline"><span class="ms">place</span>${escapeHtml(p.author.place)}</span>`);
@@ -2376,6 +3107,17 @@ function renderTimeline(){
     if(p.author.now){
       chips.push(`<span class="chip chip--amber"><span class="ms">local_fire_department</span>NOW</span>`);
     }
+
+    // Ratings (3-axis)
+    if(p.ratings){
+      const mapCost = {1:'安い',2:'ふつう',3:'高め'};
+      const mapTime = {1:'早い',2:'ふつう',3:'遅い'};
+      const mapVibe = {1:'静か',2:'ふつう',3:'賑やか'};
+      if(p.ratings.cost) chips.push(`<span class="chip chip--outline"><span class="ms">paid</span>コスパ:${escapeHtml(mapCost[p.ratings.cost]||'')}</span>`);
+      if(p.ratings.time) chips.push(`<span class="chip chip--outline"><span class="ms">schedule</span>タイパ:${escapeHtml(mapTime[p.ratings.time]||'')}</span>`);
+      if(p.ratings.vibe) chips.push(`<span class="chip chip--outline"><span class="ms">groups</span>雰囲気:${escapeHtml(mapVibe[p.ratings.vibe]||'')}</span>`);
+    }
+
 
     // Machi-Report chip (街レポ)
     if(p.kind==='report'){
@@ -2457,7 +3199,21 @@ function renderTimeline(){
     if(!arr || !arr.length) return '';
     const m = arr[0]; // limit: 1 image per post
     const cls = m.ratio==='square' ? 'aspect-square' : (m.ratio==='video' ? 'aspect-video' : 'h-32');
-    return `<div class="img-placeholder w-full ${cls} mb-3 rounded-sm">[Image: ${escapeHtml(m.label)}]</div>`;
+    const alt = escapeHtml(m.label || 'Photo');
+    // Robust fallback (fixes occasional broken links / missing src)
+    const seed = encodeURIComponent((m.seed || m.label || 'shinbashi').toString().slice(0, 40));
+    const fallback = `https://picsum.photos/seed/${seed}/1200/800`;
+
+    const src = m.src ? escapeHtml(m.src) : fallback;
+    const fb = escapeHtml(fallback);
+
+    return `<div class="w-full ${cls} mb-3 rounded-sm overflow-hidden bg-gray-100">
+      <img src="${src}" alt="${alt}"
+        class="w-full h-full object-cover"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        onerror="this.onerror=null;this.src='${fb}'" />
+    </div>`;
   }
 
   function renderPetition(pet){
@@ -2563,18 +3319,41 @@ function renderTimeline(){
   }
 
   // ---------- Composer ----------
-  function openComposer(){
+  function openComposer(opts={}){
     // Anyone can open the UI, but posting requires verified (guard on submit)
     nav('compose');
     document.getElementById('compose-author').textContent = prettyPersona();
     document.getElementById('compose-text').value = '';
     document.getElementById('compose-pinmap').checked = false;
+    state.compose.ratings = {cost:null,time:null,vibe:null};
+    updateComposeRatingsUI();
+    // Plan context (optional)
+    const defs = getPlanDefs?.() || {};
+    state.compose.planId = opts.planId || null;
+    state.compose.planTitle = opts.planTitle || (opts.planId ? (defs[opts.planId]?.title || null) : null);
+    updateComposePlanUI();
     state.compose.type = 'normal';
     updateComposeTypeUI();
     updatePinMapPreview();
     bindGuards();
   }
-  function closeComposer(){
+  
+  function clearComposePlan(){
+    state.compose.planId = null;
+    state.compose.planTitle = null;
+    updateComposePlanUI();
+    toast('企画を外しました');
+  }
+
+  function updateComposePlanUI(){
+    const box = document.getElementById('compose-planbox');
+    const name = document.getElementById('compose-planname');
+    const show = !!state.compose.planId;
+    if(box) box.classList.toggle('hidden', !show);
+    if(name) name.textContent = state.compose.planTitle || '企画';
+  }
+
+function closeComposer(){
     goTab('home');
   }
   function setComposeType(t){
@@ -2592,7 +3371,40 @@ function renderTimeline(){
         : 'py-3 text-xs font-black border border-gray-300 rounded-sm';
     });
   }
-  function updatePinMapPreview(){
+  
+  function setComposeRating(axis, val){
+    if(!state.compose.ratings) state.compose.ratings = {cost:null,time:null,vibe:null};
+    const cur = state.compose.ratings[axis] ?? null;
+    state.compose.ratings[axis] = (cur===val) ? null : val;
+    updateComposeRatingsUI();
+  }
+
+  function updateComposeRatingsUI(){
+    const r = state.compose.ratings || {cost:null,time:null,vibe:null};
+    const axes = [
+      {axis:'cost', ids:['rate-cost-1','rate-cost-2','rate-cost-3']},
+      {axis:'time', ids:['rate-time-1','rate-time-2','rate-time-3']},
+      {axis:'vibe', ids:['rate-vibe-1','rate-vibe-2','rate-vibe-3']},
+    ];
+    axes.forEach(a=>{
+      const v = r[a.axis];
+      a.ids.forEach((id, idx)=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        const val = idx+1;
+        const active = v===val;
+        el.className = active
+          ? 'px-3 py-2 text-xs font-black bg-[var(--brand)] text-white'
+          : 'px-3 py-2 text-xs font-black bg-white text-gray-700 hover:bg-gray-50';
+        // keep divider borders if present in original markup
+        if(idx>0){
+          el.className += ' border-l border-gray-200';
+        }
+      });
+    });
+  }
+
+function updatePinMapPreview(){
     const box = document.getElementById('pinmap-preview');
     if(!box) return;
     box.classList.toggle('hidden', !document.getElementById('compose-pinmap').checked);
@@ -2610,6 +3422,7 @@ function renderTimeline(){
       return;
     }
     const pin = document.getElementById('compose-pinmap').checked;
+    const ratings = state.compose.ratings || {cost:null,time:null,vibe:null};
 
     const author = currentAuthor();
     const newId = 'u'+Date.now().toString(36);
@@ -2622,8 +3435,15 @@ function renderTimeline(){
       title: state.compose.type==='petition' ? '（タイトル未設定）' : null,
       text,
       pinMap: pin,
+      ratings: (ratings.cost||ratings.time||ratings.vibe) ? ratings : null,
       stats:{ like:0, comment:0 }
     };
+
+    if(state.compose.planId){
+      p.planId = state.compose.planId;
+      p.planTitle = state.compose.planTitle || null;
+    }
+
 
     if(state.compose.type==='petition'){
       p.title = '新しい注意（Mock）';
@@ -2642,6 +3462,7 @@ function renderTimeline(){
     }
 
     state.posts.unshift(p);
+    bumpRank(1);
     toast('投稿しました');
     goTab('home');
     renderTimeline();

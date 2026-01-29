@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SocioVoice SHINBASHI | sv_shinbashi_v1_09</title>
+  <title>SocioVoice SHINBASHI | sv_shinbashi_v1_17</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
@@ -437,7 +437,7 @@
     .hot-card{min-width:170px;max-width:190px}
     .hot-card:focus{outline:2px solid var(--brand);outline-offset:2px}
 </style>
-  <meta name="sv_version" content="sv_shinbashi_v1_09">
+  <meta name="sv_version" content="sv_shinbashi_v1_17_allphotos">
 </head>
 <body>
 <div id="app-frame">
@@ -2612,6 +2612,7 @@ function renderLikedPosts(){
         meta:{ts:now - 6*60*1000, time:'6分前', tag:'今夜', tagIcon:'local_fire_department', tagTone:'amber'},
         title:'今夜の新橋：混雑＆キャッチ注意マップ（目安）',
         textPublic:'混雑しやすい通りと、声かけが多いエリアの目安です。\n無理な呼び込みはスルーでOK。トラブルは無理せず離脱。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_1/1200/720'}]
         actions:{ seen:true }
       },
       {
@@ -2622,7 +2623,7 @@ function renderLikedPosts(){
         planId:'today',
         planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
         text:'【〜19:00】ハッピーアワーやってます。サク飲み歓迎🍺',
-        media:[{type:'image', label:'Happy Hour', ratio:'video'}],
+        media:[{type:'image', label:'Happy Hour', ratio:'video', src:'https://picsum.photos/seed/shinbashi_2/1200/720'}],
         stats:{like:23, comment:3}
       },
       {
@@ -2633,6 +2634,7 @@ function renderLikedPosts(){
         planId:'today',
         planTitle:'終電まで：立ち飲み縛り（〜3,000円）',
         textPublic:'終電前の0次会って、みんなどこから入る？\n「一杯だけ・静かめ」だと西口側がラクだった。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_3/1200/720'}]
         stats:{like:41, comment:9}
       },
       {
@@ -2641,7 +2643,7 @@ function renderLikedPosts(){
         author:{type:'shop', name:'串焼き しんばし太郎', badge:'SHOP', icon:'restaurant', place:'烏森口'},
         meta:{ts:now - 52*60*1000, time:'52分前', tag:'おすすめ', tagTone:'teal', tagIcon:'thumb_up'},
         text:'本日、串5本セットが少しお得です。1軒目にも2軒目にもどうぞ。',
-        media:[{type:'image', label:'Yakitori Set', ratio:'video'}],
+        media:[{type:'image', label:'Yakitori Set', ratio:'video', src:'https://picsum.photos/seed/shinbashi_4/1200/720'}],
         ticket:{ title:'串5本セット 50円引き', note:'※19:00まで', remain:'残り 28枚' },
         stats:{like:19, comment:2}
       },
@@ -2652,6 +2654,7 @@ function renderLikedPosts(){
         meta:{ts:now - 95*60*1000, time:'1時間半前'},
         title:'喫煙OK/NG、みんなはどっち派？',
         textPublic:'新橋だと店によって結構違うよね。\n「会話したい派」にはどのタイプが楽？',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_5/1200/720'}]
         pills:[{label:'喫煙OKが助かる', n:18},{label:'禁煙の方がいい', n:26},{label:'どっちでも', n:9}]
       },
       {
@@ -2661,6 +2664,7 @@ function renderLikedPosts(){
         meta:{ts:now - 2*60*60*1000, time:'2時間前'},
         title:'🔥 いま注目：終電前の“サク飲み”導線',
         textPublic:'「一杯だけ」「静かめ」「早め撤収」派の投稿が集まっています。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_6/1200/720'}]
         stats:{like:72, comment:21}
       },
       {
@@ -2669,7 +2673,7 @@ function renderLikedPosts(){
         author:{type:'shop', name:'餃子スタンド 88', badge:'SHOP', icon:'ramen_dining', place:'SL広場側', now:true},
         meta:{ts:now - 3*60*60*1000, time:'3時間前'},
         text:'【本日】餃子＋ハイボールのセットあります。0次会にも〆にも。',
-        media:[{type:'image', label:'Gyoza & Highball', ratio:'video'}],
+        media:[{type:'image', label:'Gyoza & Highball', ratio:'video', src:'https://picsum.photos/seed/shinbashi_7/1200/720'}],
         stats:{like:34, comment:4}
       },
       {
@@ -2679,8 +2683,9 @@ function renderLikedPosts(){
         meta:{ts:now - 5*60*60*1000, time:'5時間前', flag:'AI整形', flagIcon:'auto_fix_high', flagTone:'purple'},
         title:'「呼び込み」って断り方の正解ある？',
         textPublic:'声かけが多い時、角が立たない断り方を知りたい。\n（※言い回しを整えて表示）',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_8/1200/720'}]
         textOriginal:'呼び込みうざい。断ってもついてくる時どうすりゃいいの？',
-        actions:{reacts:[{k:'🤔 懸念あり', n:15, needVerify:true},{k:'💡 アイデア', n:12, needVerify:true}]},
+        actions:{reacts:[{k:'懸念', n:15, needVerify:true},{k:'アイデア', n:12, needVerify:true}]},
         stats:{like:58, comment:17}
       },
       {
@@ -2689,8 +2694,123 @@ function renderLikedPosts(){
         author:{type:'shop', name:'立ち食い そば丸（新橋）', badge:'SHOP', icon:'restaurant', place:'駅前', now:false},
         meta:{ts:now - 7*60*60*1000, time:'7時間前', tag:'〆', tagTone:'slate', tagIcon:'nightlight'},
         text:'〆にどうぞ。今夜は天ぷらが揚がってます。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_9/1200/720'}]
         stats:{like:12, comment:0}
       }
+      ,
+      {
+        id:'post-10',
+        kind:'user',
+        author:{type:'user', name:'マサ', badges:['ガード下'], icon:'person'},
+        meta:{ts:now - 9*60*60*1000, time:'9時間前', tag:'写真', tagTone:'slate', tagIcon:'photo_camera'},
+        title:'ガード下、今日はわりと歩きやすい',
+        textPublic:'人の流れが速めで、声かけも少なめ。サク飲み→次に移るなら今が楽。',
+        media:[{type:'image', label:'Underpass Night', ratio:'video', src:'https://picsum.photos/seed/shinbashi_10/1200/720'}],
+        ratings:{cost:2,time:1,vibe:3},
+        stats:{like:44, comment:6}
+      },
+      {
+        id:'post-11',
+        kind:'shop',
+        author:{type:'shop', name:'ハイボール研究所', badge:'SHOP', icon:'local_bar', place:'新橋駅近'},
+        meta:{ts:now - 10*60*60*1000, time:'10時間前', tag:'おすすめ', tagTone:'teal', tagIcon:'thumb_up'},
+        text:'ハイボール各種、今夜は柑橘系が多め。最初の1杯にどうぞ。',
+        media:[{type:'image', label:'Highball', ratio:'video', src:'https://picsum.photos/seed/shinbashi_11/1200/720'}],
+        stats:{like:21, comment:1}
+      },
+      {
+        id:'post-12',
+        kind:'discussion',
+        author:{type:'user', name:'リョウ', badges:['二次会'], icon:'person'},
+        meta:{ts:now - 11*60*60*1000, time:'11時間前'},
+        title:'二次会、静かめに切り替えるタイミングっていつ？',
+        textPublic:'賑やか→静かめに移る時のおすすめ導線ある？',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_12/1200/720'}]
+        pills:[{label:'一次会で切る', n:12},{label:'22時で切る', n:17},{label:'気分次第', n:9}]
+      },
+      {
+        id:'post-13',
+        kind:'user',
+        author:{type:'user', name:'ユウキ', badges:['0次会'], icon:'person'},
+        meta:{ts:now - 12*60*60*1000, time:'12時間前', tag:'行きたい', tagTone:'amber', tagIcon:'star'},
+        title:'0次会メモ：立ち飲み→串→〆',
+        textPublic:'まず一杯、次に串で腹を決めて、最後に軽く〆るのが安定だった。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_13/1200/720'}]
+        ratings:{cost:1,time:1,vibe:2},
+        stats:{like:38, comment:4}
+      },
+      {
+        id:'post-14',
+        kind:'user',
+        author:{type:'user', name:'サトミ', badges:['〆派'], icon:'person'},
+        meta:{ts:now - 13*60*60*1000, time:'13時間前', tag:'〆', tagTone:'slate', tagIcon:'nightlight'},
+        title:'〆ラーメン、今日は塩が良かった',
+        textPublic:'脂が重くないやつ。終電前でもいける。',
+        media:[{type:'image', label:'Ramen', ratio:'video', src:'https://picsum.photos/seed/shinbashi_14/1200/720'}],
+        ratings:{cost:2,time:2,vibe:2},
+        stats:{like:27, comment:2}
+      },
+      {
+        id:'post-15',
+        kind:'user',
+        author:{type:'user', name:'タケル', badges:['静かめ'], icon:'person'},
+        meta:{ts:now - 14*60*60*1000, time:'14時間前', tag:'静かめ', tagTone:'slate', tagIcon:'volume_off'},
+        title:'会話したい日は、席の間隔広い店が楽',
+        textPublic:'音量が低めだと、テンション保ったまま話せる。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_15/1200/720'}]
+        ratings:{cost:2,time:2,vibe:1},
+        stats:{like:22, comment:3}
+      },
+      {
+        id:'post-16',
+        kind:'shop',
+        author:{type:'shop', name:'小さな和食 みなと', badge:'SHOP', icon:'restaurant', place:'汐留寄り'},
+        meta:{ts:now - 15*60*60*1000, time:'15時間前', tag:'禁煙', tagTone:'slate', tagIcon:'smoke_free'},
+        text:'禁煙席のみ。遅めの時間は落ち着きます。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_16/1200/720'}]
+        stats:{like:9, comment:0}
+      },
+      {
+        id:'post-17',
+        kind:'discussion',
+        author:{type:'user', name:'ナオ', badges:['予算'], icon:'person'},
+        meta:{ts:now - 16*60*60*1000, time:'16時間前'},
+        title:'予算5,000円なら、どんな組み方が満足？',
+        textPublic:'0次会〜〆まで、現実的なルート知りたい。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_17/1200/720'}]
+        pills:[{label:'1軒でゆっくり', n:8},{label:'2軒はしご', n:19},{label:'軽く3軒', n:11}]
+      },
+      {
+        id:'post-18',
+        kind:'user',
+        author:{type:'user', name:'ケン', badges:['写真'], icon:'person'},
+        meta:{ts:now - 17*60*60*1000, time:'17時間前', tag:'SL広場', tagTone:'slate', tagIcon:'train'},
+        title:'SL広場側、集合しやすいけど混む',
+        textPublic:'待ち合わせは端の方が良い。真ん中は詰まる。',
+        media:[{type:'image', label:'Crowd', ratio:'video', src:'https://picsum.photos/seed/shinbashi_18/1200/720'}],
+        stats:{like:31, comment:5}
+      },
+      {
+        id:'post-19',
+        kind:'shop',
+        author:{type:'shop', name:'酒場 さくっと', badge:'SHOP', icon:'local_bar', place:'西口'},
+        meta:{ts:now - 18*60*60*1000, time:'18時間前', tag:'空席', tagTone:'teal', tagIcon:'event_seat'},
+        text:'23時台は回転早め。1〜2名なら入りやすいです。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_19/1200/720'}]
+        stats:{like:14, comment:1}
+      },
+      {
+        id:'post-20',
+        kind:'debate',
+        author:{type:'user', name:'ミホ', badges:['注意'], icon:'person'},
+        meta:{ts:now - 20*60*60*1000, time:'20時間前', flag:'AI整形', flagIcon:'auto_fix_high', flagTone:'purple'},
+        title:'声かけが強い時、どう離脱する？',
+        textPublic:'角が立たない返しと、離脱のコツが知りたい。',
+        media:[{type:'image', label:'', ratio:'video', src:'https://picsum.photos/seed/shinbashi_20/1200/720'}]
+        actions:{reacts:[{k:'懸念', n:11, needVerify:true},{k:'対策', n:18, needVerify:true}]},
+        stats:{like:46, comment:13}
+      }
+
     ];
   }
 
@@ -2732,7 +2852,7 @@ function renderTimeline(){
     }
 
     // HOT SHINBASHI picks should be computed before guest slicing
-    const hotPicks = (state.status==='guest') ? [] : getHotShinbashiPicks(posts);
+    const hotPicks = getHotShinbashiPicks(posts);
 
     // In guest mode (preview), user should be on guest screen; still keep safe:
     if(state.status==='guest'){
@@ -2813,7 +2933,7 @@ function renderTimeline(){
   function renderHotShinbashiModule(picks){
     const cards = (picks||[]).map(p=>{
       const m = (p.media||[])[0];
-      const img = m ? `<div class="img-placeholder w-full aspect-video rounded-sm">[Image: ${escapeHtml(m.label||'Photo')}]</div>` : '';
+      const img = m ? (m.src ? `<div class="w-full aspect-video rounded-sm overflow-hidden bg-gray-100"><img src="${escapeHtml(m.src)}" alt="${escapeHtml(m.label||'Photo')}" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" /></div>` : `<div class="img-placeholder w-full aspect-video rounded-sm">[Image: ${escapeHtml(m.label||'Photo')}]</div>`) : '';
       const dt = formatPostTime(p);
       const name = escapeHtml(p.author?.name || '');
       const meta = `<div class="mt-2 text-[11px] text-gray-500 flex items-center justify-between gap-2">
@@ -3092,7 +3212,21 @@ function renderTimeline(){
     if(!arr || !arr.length) return '';
     const m = arr[0]; // limit: 1 image per post
     const cls = m.ratio==='square' ? 'aspect-square' : (m.ratio==='video' ? 'aspect-video' : 'h-32');
-    return `<div class="img-placeholder w-full ${cls} mb-3 rounded-sm">[Image: ${escapeHtml(m.label)}]</div>`;
+    const alt = escapeHtml(m.label || 'Photo');
+    // Robust fallback (fixes occasional broken links / missing src)
+    const seed = encodeURIComponent((m.seed || m.label || 'shinbashi').toString().slice(0, 40));
+    const fallback = `https://picsum.photos/seed/${seed}/1200/800`;
+
+    const src = m.src ? escapeHtml(m.src) : fallback;
+    const fb = escapeHtml(fallback);
+
+    return `<div class="w-full ${cls} mb-3 rounded-sm overflow-hidden bg-gray-100">
+      <img src="${src}" alt="${alt}"
+        class="w-full h-full object-cover"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        onerror="this.onerror=null;this.src='${fb}'" />
+    </div>`;
   }
 
   function renderPetition(pet){
